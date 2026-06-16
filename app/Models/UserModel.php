@@ -17,7 +17,7 @@ class UserModel extends Model
         'name'     => 'required|min_length[2]',
         'email'    => 'required|valid_email|is_unique[users.email]',
         'password' => 'required|min_length[6]',
-        'role'     => 'required|in_list[admin,doctor,nurse,receptionist]',
+        'role'     => 'required|in_list[admin,doctor,nurse,receptionist,lab]',
     ];
 
     protected $validationMessages = [

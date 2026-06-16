@@ -14,4 +14,5 @@ $routes->post('/api/admin/create', 'UserController::createAdmin');
 $routes->get('/users',        'UserController::index');
 $routes->get('/users/create', 'UserController::create');
 $routes->post('/users/store', 'UserController::store');
-
+$routes->get('/lablist', 'UserController::labList');
+$routes->get('/registerform', 'UserController::registerForm');

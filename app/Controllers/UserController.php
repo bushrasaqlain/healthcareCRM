@@ -95,4 +95,22 @@ class UserController extends BaseController
 
         return view('users/index', $data);
     }
+    public function labList()
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
+        return view('dbadmin/lablist');
+    }
+    // ─── DASHBOARD: Show register form ───────────────────────────
+public function registerForm()
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
+
+    return view('dbadmin/registerform');
 }
+}
+
