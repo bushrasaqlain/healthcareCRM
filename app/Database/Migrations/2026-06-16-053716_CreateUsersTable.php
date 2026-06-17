@@ -26,6 +26,11 @@ class CreateUsersTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
             ],
+            'password_hint' => [      
+        'type'       => 'VARCHAR',
+        'constraint' => 100,
+        'null'       => true,
+    ],
             'role' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 50,

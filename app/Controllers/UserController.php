@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use App\Models\LabModel;
+use Config\Database;
 
 class UserController extends BaseController
 {
@@ -95,4 +97,82 @@ class UserController extends BaseController
 
         return view('users/index', $data);
     }
+
+    public function labList()
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
+        return view('dbadmin/lablist');
+    }
+
+    // ─── DASHBOARD: Show register form ───────────────────────────
+    public function registerForm()
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
+        return view('dbadmin/registerform');
+    }
+
+    // ─── DASHBOARD: Save new lab partner (users + labs) ──────────
+    public function registerLab()
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
+
+    $password        = $this->request->getPost('password');
+    $confirmPassword = $this->request->getPost('confirm_password');
+
+    if ($password !== $confirmPassword) {
+        return redirect()->to('/registerform')
+                         ->withInput()
+                         ->with('errors', ['Password and Confirm Password do not match.']);
+    }
+
+    $userModel = new UserModel();
+    $labModel  = new LabModel();
+
+    $userData = [
+        'name'     => $this->request->getPost('name'),
+        'email'    => $this->request->getPost('email'),
+        'password' => $password,
+        'role'     => 'lab',
+        'status'   => 'active',
+    ];
+
+    if (!$userModel->validate($userData)) {
+        return redirect()->to('/registerform')
+                         ->withInput()
+                         ->with('errors', $userModel->errors());
+    }
+
+    $db = \Config\Database::connect();
+    $db->transStart();
+
+    $userModel->createUser($userData);
+    $userId = $db->insertID();
+
+    $labModel->createLab([
+        'user_id'        => $userId,
+        'contact_person' => $this->request->getPost('contact_person'),
+        'phone'          => $this->request->getPost('phone'),
+        'license_number' => $this->request->getPost('license_number'),
+        'address'        => $this->request->getPost('address'),
+    ]);
+
+    $db->transComplete();
+
+    if ($db->transStatus() === false) {
+        return redirect()->to('/registerform')
+                         ->withInput()
+                         ->with('errors', ['Something went wrong. Please try again.']);
+    }
+
+    return redirect()->to('/registerform')
+                     ->with('success', 'Lab registered successfully.');
+}
 }

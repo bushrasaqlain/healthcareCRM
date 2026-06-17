@@ -15,4 +15,8 @@ $routes->post('/api/admin/create', 'UserController::createAdmin');
 $routes->get('/users',        'UserController::index');
 $routes->get('/users/create', 'UserController::create');
 $routes->post('/users/store', 'UserController::store');
-
+$routes->get('/lablist', 'LabController::index');
+$routes->get('/registerform', 'UserController::registerForm');
+$routes->post('/labs/store', 'UserController::registerLab');
+$routes->get('/labs/(:num)/pricelist',  'LabController::priceList/$1');
+$routes->post('/labs/(:num)/pricelist', 'LabController::importPriceList/$1');
