@@ -20,3 +20,8 @@ $routes->get('/registerform', 'UserController::registerForm');
 $routes->post('/labs/store', 'UserController::registerLab');
 $routes->get('/labs/(:num)/pricelist',  'LabController::priceList/$1');
 $routes->post('/labs/(:num)/pricelist', 'LabController::importPriceList/$1');
+
+
+ // Booking
+$routes->get('/booking/new',        'BookingController::index');
+$routes->post('booking/add', 'BookingController::add_booking');
