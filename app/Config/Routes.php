@@ -25,3 +25,12 @@ $routes->post('/labs/(:num)/pricelist', 'LabController::importPriceList/$1');
  // Booking
 $routes->get('/booking/new',        'BookingController::index');
 $routes->post('booking/add', 'BookingController::add_booking');
+
+$routes->post('/labs/store', 'UserController::registerLab');
+$routes->get('/labs/(:num)/pricelist',  'LabController::priceList/$1');
+$routes->post('/labs/(:num)/pricelist', 'LabController::importPriceList/$1');
+
+// Lab Dashboard Routes
+$routes->get('/labDashboard/dashboard', 'LabController::dashboard');
+$routes->get('/labDashboard/sample_collected/(:num)', 'LabController::sampleCollected/$1');
+$routes->get('/labDashboard/sample_collected', 'LabController::sampleCollected');
