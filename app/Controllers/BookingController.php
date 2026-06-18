@@ -485,4 +485,103 @@ public function viewInvoice($bookingId)
             'share_url' => $shareUrl
         ]);
     }
+    // Add to BookingController
+
+public function editTests($patientId = null)
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
+
+    $db = \Config\Database::connect();
+
+    $patient = $db->table('patients')->where('id', $patientId)->get()->getRowArray();
+    if (!$patient) {
+        return redirect()->back()->with('error', 'Patient not found.');
+    }
+
+    // Current bookings for this patient
+    $currentBookings = $db->table('patient_test_bookings ptb')
+        ->select('ptb.id, ptb.fk_test_id, ptb.discount_percent, ptb.paid_status, lt.test_name, lt.test_code, lt.rate')
+        ->join('lab_tests lt', 'lt.id = ptb.fk_test_id', 'left')
+        ->where('ptb.fk_patient_id', $patientId)
+        ->orderBy('ptb.date_created', 'ASC')
+        ->get()->getResultArray();
+
+    // All available tests
+    $allTests = $db->table('lab_tests')
+        ->orderBy('test_name', 'ASC')
+        ->get()->getResultArray();
+
+    return view('labDashboard/edit_tests', [
+        'patient'         => $patient,
+        'currentBookings' => $currentBookings,
+        'allTests'        => $allTests,
+    ]);
+}
+
+public function updateTests($patientId = null)
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
+
+    $db           = \Config\Database::connect();
+    $bookingModel = new PatientTestBookingModel();
+    $now          = date('Y-m-d H:i:s');
+
+    // IDs to delete (removed tests)
+    $deleteIds = $this->request->getPost('delete_ids') ?? [];
+    if (!empty($deleteIds)) {
+        $bookingModel->whereIn('id', $deleteIds)
+                     ->where('fk_patient_id', $patientId)  // safety check
+                     ->delete();
+    }
+
+    // New tests to add
+    $newTests = $this->request->getPost('new_tests') ?? [];
+    $insertRows = [];
+
+    foreach ($newTests as $t) {
+        $testId   = (int)($t['test_id'] ?? 0);
+        $discount = (int)($t['discount'] ?? 0);
+        $payment  = $t['payment'] ?? 'prepaid';
+
+        if ($testId <= 0) continue;
+        if ($discount < 0 || $discount > 100) $discount = 0;
+        if (!in_array($payment, ['cash', 'prepaid'], true)) $payment = 'prepaid';
+
+        $insertRows[] = [
+            'fk_patient_id'    => $patientId,
+            'fk_test_id'       => $testId,
+            'status'           => 'In Process',
+            'discount_percent' => $discount,
+            'paid_status'      => $payment,
+            'date_created'     => $now,
+            'date_updated'     => $now,
+        ];
+    }
+
+    if (!empty($insertRows)) {
+        $bookingModel->insertBatch($insertRows);
+    }
+
+    // Update existing rows (discount / payment changes)
+    $existingUpdates = $this->request->getPost('existing') ?? [];
+    foreach ($existingUpdates as $rowId => $vals) {
+        $discount = (int)($vals['discount'] ?? 0);
+        $payment  = $vals['payment'] ?? 'prepaid';
+
+        if ($discount < 0 || $discount > 100) $discount = 0;
+        if (!in_array($payment, ['cash', 'prepaid'], true)) $payment = 'prepaid';
+
+        $bookingModel->where('id', (int)$rowId)
+                     ->where('fk_patient_id', $patientId)
+                     ->set(['discount_percent' => $discount, 'paid_status' => $payment, 'date_updated' => $now])
+                     ->update();
+    }
+
+    return redirect()->to(site_url('booking/view/' . $patientId))
+                     ->with('success', 'Tests updated successfully.');
+}
 }
