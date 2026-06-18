@@ -28,6 +28,8 @@ body {
  background-color: #80a4b9; 
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  /* overflow: hidden; */
+  padding: 0;
 }
 
 hr {
@@ -196,7 +198,7 @@ textarea {
 
 
 body {
-    background: #f6f7fb;
+    background: #fff;
     color: #111827;
     font-family: 'Poppins', sans-serif;
 }
@@ -214,16 +216,48 @@ h4 {
 }
 
 
- .navbar { background-color: #ffffff; overflow: hidden; }
-    .card-body { background-color: #fcb2b2; }
-    .input-light { background-color: #eef2f7 !important; border: none !important; }
-    .input-light::placeholder { color: #8a99a8; }
-    .input-group-text-light { background-color: #eef2f7 !important; border: none !important; color: #8a99a8 !important; }
-    .btn-teal { background-color: #1c4f63; border: none; color: #fff; }
-    .btn-teal:hover { background-color: #15404f; color: #fff; }
-    .accent-cyan { color: #4fd1c5; }
-    .subtitle-muted { color: #a9c2cc; }
-    .nav-link.active-tab { color: #4fd1c5 !important; font-weight: 600; }
+.navbar { 
+  background-color: #ffffff; 
+  box-shadow: 0 2px 16px rgba(245, 245, 245, 0.1);
+  border-bottom: 3px solid #e2e8f0;
+  padding: 20px;
+}
+
+.navbar1 { 
+  background-color: #2463c2; 
+  box-shadow: 0 2px 16px rgba(194, 36, 44, 0.3);
+  border-bottom: 2px solid #1a4fa8;
+}
+
+.card-body { color: #fff; }
+
+.input-light { background-color: #eef2f7 !important; border: none !important; }
+.input-light::placeholder { color: #8a99a8; }
+
+.input-group-text-light { background-color: #eef2f7 !important; border: none !important; color: #8a99a8 !important; }
+
+.btn-teal { background-color: #1c4f63; border: none; color: #fff; }
+.btn-teal:hover { background-color: #15404f; color: #fff; }
+
+.accent-cyan { color: #4fd1c5; }
+.subtitle-muted { color: #a9c2cc; }
+
+/* Active tab — underline style like the screenshot */
+.nav-link.active-tab { 
+  color: #2463c2 !important; 
+  font-weight: 600;
+  border-bottom: 2px solid #2463c2;
+  padding-bottom: 4px;
+}
+
+/* OR box outline style */
+.nav-link.active-tab-box { 
+  color: #2463c2 !important; 
+  font-weight: 600;
+  border: 2px solid #2463c2;
+  border-radius: 6px;
+  padding: 4px 12px;
+}
 
     
 /* New Booking Button */
@@ -253,7 +287,8 @@ h4 {
     border-radius: 16px;
     padding: 18px 20px;
     border: 1px solid #e8ebef;
-    box-shadow: 0 2px 6px rgba(0,0,0,.03);
+    box-shadow: 0 2px 6px   
+    rgba(167, 23, 23, 0.03);
 }
 
 .total-card {
@@ -579,3 +614,8 @@ h4 {
     gap: 14px;
     margin-bottom: 28px;
   }
+
+.form-label {
+  color: #176CC7;
+}
+

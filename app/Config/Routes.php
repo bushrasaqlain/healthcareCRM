@@ -34,3 +34,10 @@ $routes->post('/labs/(:num)/pricelist', 'LabController::importPriceList/$1');
 $routes->get('/labDashboard/dashboard', 'LabController::dashboard');
 $routes->get('/labDashboard/sample_collected/(:num)', 'LabController::sampleCollected/$1');
 $routes->get('/labDashboard/sample_collected', 'LabController::sampleCollected');
+$routes->post('/labs/(:num)/pricelist/update', 'LabController::updatePriceList/$1');
+$routes->get('/labs/(:num)/edit',  'LabController::edit/$1');
+$routes->post('/labs/(:num)/edit', 'LabController::update/$1');
+$routes->get('/labs/(:num)/phlebotomist', 'LabController::phlebotomist/$1');
+$routes->post('/labs/(:num)/phlebotomist', 'LabController::importPhlebotomist/$1');
+
+$routes->get('/labDashboard/pricelist', 'LabController::labPriceList');

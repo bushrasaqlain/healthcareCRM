@@ -16,57 +16,151 @@
   <div class="card border-0 shadow-sm">
     <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead style="background:#134557; color:#fff;">
-            <tr>
-              <th class="py-3 px-4">#</th>
-              <th class="py-3">Name</th>
-              <th class="py-3">Person</th>
-              <th class="py-3">Email</th>
-              <th class="py-3">Phone</th>
-              <th class="py-3">License</th>
-              <th class="py-3">Address</th>
-              <th class="py-3">Status</th>
-              <th class="py-3">Actions</th>
-            </tr>
-          </thead>
+  <table class="table table-hover mb-0" style="width: 100%; table-layout: fixed;">
+    <thead style="background:#134557; color:#fff;">
+      <tr>
+        <th class="py-3 px-4 text-center" style="width: 8%;">#</th>
+        <th class="py-3 text-center" style="width: 22%;">Name</th>
+        <th class="py-3 text-center" style="width: 25%;">Email</th>
+        <th class="py-3 text-center" style="width: 12%;">Status</th>
+        <th class="py-3 text-center" style="width: 33%;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php if (!empty($labs)): ?>
+        <?php foreach ($labs as $i => $lab): ?>
+          <tr>
+            <td class="px-4 text-center"><?= $i + 1 ?></td>
+            <td class="text-center">
+              <a href="javascript:void(0)"
+                 class="fw-semibold text-decoration-none lab-name-link"
+                 style="color:#134557;"
+                 data-bs-toggle="modal"
+                 data-bs-target="#labDetailsModal"
+                 data-name="<?= esc($lab['name']) ?>"
+                 data-person="<?= esc($lab['contact_person']) ?>"
+                 data-license="<?= esc($lab['license_number']) ?>"
+                 data-address="<?= esc($lab['address']) ?>"
+                 data-email="<?= esc($lab['email']) ?>"
+                 data-password="<?= esc($lab['password_hint'] ?? '') ?>">
+                <?= esc($lab['name']) ?>
+              </a>
+            </td>
+            <td class="text-center"><?= esc($lab['email']) ?></td>
+            <td class="text-center">
+              <?php if ($lab['status'] === 'active'): ?>
+                <span class="badge bg-success">Active</span>
+              <?php else: ?>
+                <span class="badge bg-secondary">Inactive</span>
+              <?php endif; ?>
+            </td>
+            <td class="text-center">
+  <?php if ($lab['test_count'] > 0): ?>
+    <a href="<?= base_url('labs/' . $lab['id'] . '/pricelist?mode=view') ?>"
+       class="btn btn-sm btn-outline-success me-1" title="View List"
+       data-bs-toggle="tooltip" data-bs-placement="top">
+      <i class="ti ti-list"></i>
+    </a>
+    <a href="<?= base_url('labs/' . $lab['id'] . '/pricelist?mode=update') ?>"
+       class="btn btn-sm text-white me-1" style="background:#134557;"
+       title="Update Price List" data-bs-toggle="tooltip" data-bs-placement="top">
+      <i class="ti ti-refresh"></i>
+    </a>
+  <?php else: ?>
+    <a href="<?= base_url('labs/' . $lab['id'] . '/pricelist') ?>"
+       class="btn btn-sm text-white me-1" style="background:#134557;"
+       title="Import Price List" data-bs-toggle="tooltip" data-bs-placement="top">
+      <i class="ti ti-upload"></i>
+    </a>
+  <?php endif; ?>
+
+  <a href="<?= base_url('labs/' . $lab['id'] . '/phlebotomist') ?>"
+     class="btn btn-sm btn-outline-primary me-1"
+     title="Import Phlebotomist List" data-bs-toggle="tooltip" data-bs-placement="top">
+    <i class="ti ti-user-plus"></i>
+  </a>
+
+  <a href="<?= base_url('labs/' . $lab['id'] . '/edit') ?>"
+     class="btn btn-sm btn-outline-secondary"
+     title="Edit Lab" data-bs-toggle="tooltip" data-bs-placement="top">
+    <i class="ti ti-edit"></i>
+  </a>
+</td>
+          </tr>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <tr>
+          <td colspan="5" class="text-center text-muted py-4">No labs registered yet.</td>
+        </tr>
+      <?php endif; ?>
+    </tbody>
+  </table>
+</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Lab Details Modal -->
+<div class="modal fade" id="labDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="background:#134557; color:#fff;">
+        <h5 class="modal-title" id="modalLabName">Lab Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-borderless mb-0">
           <tbody>
-            <?php if (!empty($labs)): ?>
-              <?php foreach ($labs as $i => $lab): ?>
-                <tr>
-                  <td class="px-4"><?= $i + 1 ?></td>
-                  <td><?= esc($lab['name']) ?></td>
-                  <td><?= esc($lab['contact_person']) ?></td>
-                  <td><?= esc($lab['email']) ?></td>
-                  <td><?= esc($lab['phone']) ?></td>
-                  <td><?= esc($lab['license_number']) ?></td>
-                  <td><?= esc($lab['address']) ?></td>
-                  <td>
-                    <?php if ($lab['status'] === 'active'): ?>
-                      <span class="badge bg-success">Active</span>
-                    <?php else: ?>
-                      <span class="badge bg-secondary">Inactive</span>
-                    <?php endif; ?>
-                  </td>
-                  <td>
-                    <a href="<?= base_url('labs/' . $lab['id'] . '/pricelist') ?>"
-                       class="btn btn-sm text-white" style="background:#134557;">
-                      <i class="ti ti-upload me-1"></i> Import
-                    </a>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <tr>
-                <td colspan="9" class="text-center text-muted py-4">No labs registered yet.</td>
-              </tr>
-            <?php endif; ?>
+            <tr>
+              <th class="text-muted" style="width:35%;">Lab Name</th>
+              <td id="modalName"></td>
+            </tr>
+            <tr>
+              <th class="text-muted">Contact Person</th>
+              <td id="modalPerson"></td>
+            </tr>
+            <tr>
+              <th class="text-muted">License Number</th>
+              <td id="modalLicense"></td>
+            </tr>
+            <tr>
+              <th class="text-muted">Address</th>
+              <td id="modalAddress"></td>
+            </tr>
+            <tr>
+              <th class="text-muted">Email</th>
+              <td id="modalEmail"></td>
+            </tr>
+            <tr>
+              <th class="text-muted">Password</th>
+              <td>
+  <span id="modalPassword"></span>
+</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
-
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const modalEl = document.getElementById('labDetailsModal');
+
+  modalEl.addEventListener('show.bs.modal', function (event) {
+    const link = event.relatedTarget;
+
+    document.getElementById('modalLabName').textContent = link.dataset.name || '';
+    document.getElementById('modalName').textContent = link.dataset.name || '';
+    document.getElementById('modalPerson').textContent = link.dataset.person || '';
+    document.getElementById('modalLicense').textContent = link.dataset.license || '';
+    document.getElementById('modalAddress').textContent = link.dataset.address || '';
+    document.getElementById('modalEmail').textContent = link.dataset.email || '';
+document.getElementById('modalPassword').textContent = link.dataset.password || '';
+  });
+});
+</script>
 
 <?= view('templates/footer') ?>

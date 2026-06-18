@@ -16,9 +16,7 @@
   <div class="container-fluid px-4">
 
     <a class="navbar-brand d-flex align-items-center gap-2" href="<?= base_url('dashboard') ?>">
-      <div class="bg-success rounded-3 d-flex align-items-center justify-content-center" style="width:34px; height:34px;">
-        <i class="ti ti-heart-plus"></i>
-      </div>
+      
       <span class="fw-semibold text-danger">Infinity<span class="text-primary">Healthcare</span></span>
     </a>
 
@@ -39,12 +37,12 @@
         <?php if ($userRole === 'admin'): ?>
           <li class="nav-item">
             <a class="nav-link text-black d-flex align-items-center gap-1 <?= $activePage === 'lablist' ? 'active-tab' : '' ?>" href="<?= base_url('lablist') ?>">
-              <i class="ti ti-list"></i> Lab List
+               Lab List
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-black d-flex align-items-center gap-1 <?= $activePage === 'register' ? 'active-tab' : '' ?>" href="<?= base_url('registerform') ?>">
-              <i class="ti ti-user-plus"></i> Register
+            <a class="nav-link text-primary FE-BOLD d-flex align-items-center gap-1 <?= $activePage === 'register' ? 'active-tab' : '' ?>" href="<?= base_url('registerform') ?>">
+               Register
             </a>
           </li>
         <?php endif; ?>
@@ -57,6 +55,13 @@
           </a>
         </li>
 
+         <li class="nav-item">
+            <a class="nav-link text-dark d-flex align-items-center gap-1 <?= $activePage === 'pricelist' ? 'active-tab' : '' ?>" 
+              href="<?= base_url('labDashboard/pricelist') ?>">
+                <i class="ti ti-list"></i> Price List
+            </a>
+        </li>
+
           <li class="nav-item">
             <a class="nav-link text-white d-flex align-items-center gap-1 <?= $activePage === 'tests' ? 'active-tab' : '' ?>" href="<?= base_url('tests') ?>">
               <i class="ti ti-flask"></i> Tests
@@ -67,14 +72,12 @@
       </ul>
 
       <div class="d-flex align-items-center gap-3">
-        <span class="text-white small">
+        <span class="text-black small">
           <i class="ti ti-user-circle me-1"></i>
           <?= session()->get('user_name') ?>
-          <span class="badge bg-info ms-1 text-uppercase" style="font-size: 0.6rem;">
-            <?= session()->get('user_role') ?>
-          </span>
+         
         </span>
-        <a href="<?= base_url('auth/logout') ?>" class="btn btn-info btn-sm d-flex align-items-center gap-1">
+        <a href="<?= base_url('auth/logout') ?>" class="btn btn-sm d-flex align-items-center gap-1">
           <i class="ti ti-logout"></i> Logout
         </a>
       </div>
