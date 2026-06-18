@@ -75,16 +75,17 @@
         <?= csrf_field() ?>
 
         <div class="mb-3">
-          <label class="form-label fw-medium" style="color:#1c4f63;">Email Address</label>
-          <div class="input-group">
-            <span class="input-group-text input-group-text-light">
-              <i class="ti ti-mail"></i>
-            </span>
-            <input type="email" name="email"
-                   class="form-control input-light"
-                   placeholder="admin@healthcrm.com" required/>
-          </div>
-        </div>
+  <label class="form-label fw-medium" style="color:#1c4f63;">Email Address</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light">
+      <i class="ti ti-mail"></i>
+    </span>
+    <input type="email" name="email" id="email"
+           class="form-control input-light"
+           placeholder="admin@healthcrm.com" required/>
+  </div>
+  <small class="text-danger d-none" id="email-error">Enter a valid email address.</small>
+</div>
 
         <div class="mb-4">
           <label class="form-label fw-medium" style="color:#1c4f63;">Password</label>
@@ -116,12 +117,27 @@
   </div>
 
   <script>
-    function togglePw() {
-      const inp  = document.getElementById('password');
-      const icon = document.getElementById('eye-icon');
-      inp.type   = inp.type === 'password' ? 'text' : 'password';
-      icon.className = inp.type === 'password' ? 'ti ti-eye' : 'ti ti-eye-off';
-    }
+      function togglePw() {
+    const inp  = document.getElementById('password');
+    const icon = document.getElementById('eye-icon');
+    inp.type   = inp.type === 'password' ? 'text' : 'password';
+    icon.className = inp.type === 'password' ? 'ti ti-eye' : 'ti ti-eye-off';
+  }
+
+  const emailField   = document.getElementById('email');
+  const emailError   = document.getElementById('email-error');
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  emailField.addEventListener('input', function () {
+    if (emailPattern.test(this.value)) emailError.classList.add('d-none');
+  });
+
+  emailField.addEventListener('blur', function () {
+    const valid = this.value === '' || emailPattern.test(this.value);
+    emailError.classList.toggle('d-none', valid);
+  });
+
+   
   </script>
 
 </body>

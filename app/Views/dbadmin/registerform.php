@@ -76,22 +76,24 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium">Email Address</label>
-            <div class="input-group">
-              <span class="input-group-text input-group-text-light"><i class="ti ti-mail"></i></span>
-              <input type="email" name="email" class="form-control input-light"
-                     placeholder="lab@healthcrm.com" value="<?= old('email') ?>" required/>
-            </div>
-          </div>
+  <label class="form-label fw-medium">Email Address</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light"><i class="ti ti-mail"></i></span>
+    <input type="email" name="email" id="email" class="form-control input-light"
+           placeholder="lab@healthcrm.com" value="<?= old('email') ?>" required/>
+  </div>
+  <small class="text-danger d-none" id="email-error">Enter a valid email address.</small>
+</div>
 
-          <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium">Phone Number</label>
-            <div class="input-group">
-              <span class="input-group-text input-group-text-light"><i class="ti ti-phone"></i></span>
-              <input type="text" name="phone" class="form-control input-light"
-                     placeholder="03XX-XXXXXXX" value="<?= old('phone') ?>"/>
-            </div>
-          </div>
+         <div class="col-md-6 mb-3">
+  <label class="form-label fw-medium">Phone Number</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light"><i class="ti ti-phone"></i></span>
+    <input type="text" name="phone" id="phone" class="form-control input-light"
+           placeholder="03XX-XXXXXXX or 0XX-XXXXXXX" value="<?= old('phone') ?>" maxlength="12"/>
+  </div>
+  <small class="text-danger d-none" id="phone-error">Enter a valid Pakistani mobile (03XX-XXXXXXX) or landline (0XX-XXXXXXX) number.</small>
+</div>
 
           <div class="col-md-6 mb-3">
             <label class="form-label fw-medium">License Number</label>
@@ -111,7 +113,7 @@
             </div>
           </div>
 
-          <div class="col-md-6 mb-3">
+          <!-- <div class="col-md-6 mb-3">
             <label class="form-label fw-medium">Password</label>
             <div class="input-group">
               <span class="input-group-text input-group-text-light"><i class="ti ti-lock"></i></span>
@@ -133,8 +135,38 @@
                 <i class="ti ti-eye" id="eye-icon-2"></i>
               </button>
             </div>
-          </div>
+          </div> -->
+<div class="col-md-6 mb-3">
+  <label class="form-label fw-medium">Password</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light"><i class="ti ti-lock"></i></span>
+    <input type="password" name="password" id="password" class="form-control input-light"
+           placeholder="••••••••" required/>
+    <button type="button" class="btn input-group-text-light" onclick="togglePw('password','eye-icon-1')">
+      <i class="ti ti-eye" id="eye-icon-1"></i>
+    </button>
+  </div>
+  <ul class="list-unstyled small mt-2 mb-0 d-none" id="pw-checklist">
+    <li id="pw-length" class="text-muted"><i class="ti ti-x me-1"></i>At least 8 characters</li>
+    <li id="pw-upper" class="text-muted"><i class="ti ti-x me-1"></i>One uppercase letter</li>
+    <li id="pw-lower" class="text-muted"><i class="ti ti-x me-1"></i>One lowercase letter</li>
+    <li id="pw-number" class="text-muted"><i class="ti ti-x me-1"></i>One number</li>
+    <li id="pw-special" class="text-muted"><i class="ti ti-x me-1"></i>One special character</li>
+  </ul>
+</div>
 
+<div class="col-md-6 mb-3">
+  <label class="form-label fw-medium">Confirm Password</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light"><i class="ti ti-lock"></i></span>
+    <input type="password" name="confirm_password" id="confirm_password" class="form-control input-light"
+           placeholder="••••••••" required/>
+    <button type="button" class="btn input-group-text-light" onclick="togglePw('confirm_password','eye-icon-2')">
+      <i class="ti ti-eye" id="eye-icon-2"></i>
+    </button>
+  </div>
+  <small class="text-danger d-none" id="pw-mismatch">Passwords do not match</small>
+</div>
         </div>
 
         <input type="hidden" name="role" value="lab"/>
@@ -160,6 +192,82 @@
     inp.type   = inp.type === 'password' ? 'text' : 'password';
     icon.className = inp.type === 'password' ? 'ti ti-eye' : 'ti ti-eye-off';
   }
+
+  const phoneField   = document.getElementById('phone');
+  const phoneError   = document.getElementById('phone-error');
+  const phonePattern = /^(03\d{2}-\d{7}|0(?!3)\d{2}-\d{7})$/;
+
+  // Auto-format phone as mobile (4-7 split) or landline (3-7 split)
+  phoneField.addEventListener('input', function () {
+    let digits = this.value.replace(/\D/g, '');
+    const isMobile = digits.length < 2 || digits[1] === '3';
+    const maxLen = isMobile ? 11 : 10;
+    digits = digits.slice(0, maxLen);
+
+    const splitAt = isMobile ? 4 : 3;
+    this.value = digits.length > splitAt
+      ? digits.slice(0, splitAt) + '-' + digits.slice(splitAt)
+      : digits;
+
+    // Hide the error as soon as it becomes valid, even before blur
+    if (phonePattern.test(this.value)) phoneError.classList.add('d-none');
+  });
+
+  // Final check when the user leaves the field
+  phoneField.addEventListener('blur', function () {
+    const valid = this.value === '' || phonePattern.test(this.value);
+    phoneError.classList.toggle('d-none', valid);
+  });
+
+  const emailField = document.getElementById('email');
+  const emailError = document.getElementById('email-error');
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  emailField.addEventListener('input', function () {
+    if (emailPattern.test(this.value)) emailError.classList.add('d-none');
+  });
+
+  emailField.addEventListener('blur', function () {
+    const valid = this.value === '' || emailPattern.test(this.value);
+    emailError.classList.toggle('d-none', valid);
+  });
+
+  // Password checklist + match check
+  const pwField       = document.getElementById('password');
+  const confirmField  = document.getElementById('confirm_password');
+  const pwChecklist   = document.getElementById('pw-checklist');
+
+  function setCheck(id, ok) {
+    const el = document.getElementById(id);
+    el.classList.toggle('text-success', ok);
+    el.classList.toggle('text-muted', !ok);
+    el.querySelector('i').className = ok ? 'ti ti-check me-1' : 'ti ti-x me-1';
+  }
+
+  pwField.addEventListener('focus', function () {
+    pwChecklist.classList.remove('d-none');
+  });
+
+  pwField.addEventListener('blur', function () {
+    const allValid = document.querySelectorAll('#pw-checklist .text-success').length === 5;
+    if (allValid) pwChecklist.classList.add('d-none');
+  });
+
+  pwField.addEventListener('input', function () {
+    const pw = this.value;
+    setCheck('pw-length', pw.length >= 8);
+    setCheck('pw-upper', /[A-Z]/.test(pw));
+    setCheck('pw-lower', /[a-z]/.test(pw));
+    setCheck('pw-number', /\d/.test(pw));
+    setCheck('pw-special', /[^A-Za-z0-9]/.test(pw));
+    checkMatch();
+  });
+
+  function checkMatch() {
+    const mismatch = confirmField.value.length > 0 && confirmField.value !== pwField.value;
+    document.getElementById('pw-mismatch').classList.toggle('d-none', !mismatch);
+  }
+  confirmField.addEventListener('input', checkMatch);
 </script>
 
 <?= view('templates/footer') ?>

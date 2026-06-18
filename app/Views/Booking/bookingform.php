@@ -18,8 +18,13 @@ $tests = $tests ?? [
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="bg-light">
+<?= view('templates/header', ['pageTitle' => 'Booking', 'activePage' => 'lablist']) ?>
 
 <div class="container py-4" style="max-width: 860px;">
 
@@ -29,8 +34,8 @@ $tests = $tests ?? [
     <p class="text-muted mb-0">Fill in patient details and test information</p>
   </div>
 
-  <form method="post" action="<?= site_url('booking/add') ?>">
-    <?= csrf_field() ?>
+<form method="post" action="<?= site_url('booking/add') ?>" id="booking_form">
+      <?= csrf_field() ?>
 
 
     <div class="card shadow-sm mb-4">
@@ -47,12 +52,13 @@ $tests = $tests ?? [
                    required>
           </div>
           <div class="col-md-6">
-            <label for="phone_number" class="form-label fw-semibold">
-              Phone Number <span class="text-danger">*</span>
-            </label>
-            <input type="number" class="form-control" id="phone_number" name="phone_number"
-                   placeholder="03XX-XXXXXXX" required>
-          </div>
+  <label for="phone_number" class="form-label fw-semibold">
+    Phone Number <span class="text-danger">*</span>
+  </label>
+  <input type="text" class="form-control" id="phone_number" name="phone_number"
+         inputmode="tel" placeholder="03XX-XXXXXXX or +92XXXXXXXXXX" maxlength="13" required>
+  <small class="text-danger d-none" id="phone-error">Enter a valid Pakistani number — mobile (03XX-XXXXXXX), landline (0XX-XXXXXXX), or international (+92XXXXXXXXXX).</small>
+</div>
         </div>
 
         <div class="row g-3 mb-3">
@@ -83,14 +89,39 @@ $tests = $tests ?? [
                     placeholder="Full home address for sample collection" required></textarea>
         </div>
 
-        <div class="mb-3">
+        <!-- <div class="mb-3">
           <label for="pin_location" class="form-label fw-semibold">
             <i class="bi bi-geo-alt me-1"></i>Pin Location
             <span class="text-muted fw-normal">(optional — paste Google Maps link)</span>
           </label>
           <input type="url" class="form-control" id="pin_location" name="pin_location"
                  placeholder="https://maps.google.com/...">
-        </div>
+        </div> -->
+
+        <div class="mb-3 position-relative">
+  <label for="pin_location_search" class="form-label fw-semibold">
+    <i class="bi bi-geo-alt me-1"></i>Pin Location
+    <span class="text-muted fw-normal">(optional — click the box to open the map)</span>
+  </label>
+  <input type="text" class="form-control mb-2" id="pin_location_search" autocomplete="off"
+         placeholder="Search address, area, or landmark…">
+  <div class="position-absolute w-100 bg-white border rounded-3 shadow-lg d-none"
+       id="pin_search_dropdown" style="z-index: 1050; max-height: 250px; overflow-y: auto; top: 58px;"></div>
+
+  <div class="position-relative d-none" id="pin_map_wrapper">
+    <button type="button"
+            class="btn btn-sm btn-light border rounded-circle position-absolute d-flex align-items-center justify-content-center"
+            id="pin_map_close" title="Close map"
+            style="top: 8px; right: 8px; z-index: 1000; width: 32px; height: 32px; padding: 0;">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div id="pin_map" style="height: 280px; border-radius: 0.5rem;"></div>
+  </div>
+
+  <input type="hidden" name="pin_lat" id="pin_lat">
+  <input type="hidden" name="pin_lng" id="pin_lng">
+  <input type="hidden" name="pin_address" id="pin_address">
+</div>
 
         <div class="mb-0">
           <label for="instructions" class="form-label fw-semibold">
@@ -136,11 +167,12 @@ $tests = $tests ?? [
         </div>
 
         <div class="rounded-3" id="tests_list" style="border: 1px dashed #ced4da;">
-          <div class="p-5 text-center" id="no_tests_row">
-            <i class="bi bi-flask fs-1 text-muted d-block mb-2"></i>
-            <span class="text-muted">No tests added yet. Search above to add tests.</span>
-          </div>
-        </div>
+  <div class="p-5 text-center" id="no_tests_row">
+    <i class="bi bi-flask fs-1 text-muted d-block mb-2"></i>
+    <span class="text-muted">No tests added yet. Search above to add tests.</span>
+  </div>
+</div>
+<small class="text-danger d-none mt-2 d-block" id="tests-error">Please add at least one test before submitting.</small>
       </div>
     </div>
 
@@ -191,14 +223,39 @@ $tests = $tests ?? [
 document.getElementById('patient_name').addEventListener('input', function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, '');
   });
-</script>
-<script>
+
  
- 
+ const phoneField = document.getElementById('phone_number');
+const phoneError = document.getElementById('phone-error');
+const testsError = document.getElementById('tests-error');
+const bookingForm = document.getElementById('booking_form');
   const testsList = document.getElementById('tests_list');
   const noTestsRow = document.getElementById('no_tests_row');
   const searchInput = document.getElementById('test_search');
   const searchDropdown = document.getElementById('search_dropdown');
+  function updateEmptyState() {
+  const hasTests = !!testsList.querySelector('[data-test-row]');
+  noTestsRow.classList.toggle('d-none', hasTests);
+  testsList.style.border = hasTests ? '1px solid #dee2e6' : '1px dashed #ced4da';
+  applyToAllWrapper.classList.toggle('d-none', !hasTests);
+  financialSummaryPanel.classList.toggle('d-none', !hasTests);
+  if (hasTests) testsError.classList.add('d-none');
+}
+bookingForm.addEventListener('submit', function (e) {
+  let valid = true;
+
+  if (!phonePattern.test(phoneField.value)) {
+    phoneError.classList.remove('d-none');
+    valid = false;
+  }
+
+  if (!testsList.querySelector('[data-test-row]')) {
+    testsError.classList.remove('d-none');
+    valid = false;
+  }
+
+  if (!valid) e.preventDefault();
+});
   const allTests = <?= json_encode(array_map(fn($t) => [
       'id'    => $t['id'],
       'test_code'  => $t['test_code'],
@@ -449,7 +506,169 @@ document.getElementById('patient_name').addEventListener('input', function () {
       recalcRow(row);
     });
   });
+
+  const phonePattern = /^(03\d{2}-\d{7}|0(?!3)\d{2}-\d{7}|\+92\d{9,10})$/;
+
+phoneField.addEventListener('input', function () {
+  let value = this.value;
+
+  if (value.startsWith('+')) {
+    // International — keep the + and digits only, no dash formatting
+    value = '+' + value.slice(1).replace(/\D/g, '');
+    this.value = value.slice(0, 13); // +92 plus up to 10 digits
+  } else {
+    // Local — existing mobile/landline auto-dash logic
+    let digits = value.replace(/\D/g, '');
+    const isMobile = digits.length < 2 || digits[1] === '3';
+    const maxLen = isMobile ? 11 : 10;
+    digits = digits.slice(0, maxLen);
+
+    const splitAt = isMobile ? 4 : 3;
+    this.value = digits.length > splitAt
+      ? digits.slice(0, splitAt) + '-' + digits.slice(splitAt)
+      : digits;
+  }
+
+  if (phonePattern.test(this.value)) phoneError.classList.add('d-none');
+});
+
+phoneField.addEventListener('blur', function () {
+  phoneError.classList.toggle('d-none', phonePattern.test(this.value));
+});
+
+
+  // ---- Pin location: map only opens when the search box is focused, closes via the × button ----
+
+  const defaultCenter = [33.6844, 73.0479]; // Rawalpindi/Islamabad fallback
+
+  const pinSearchInput = document.getElementById('pin_location_search');
+  const pinDropdown     = document.getElementById('pin_search_dropdown');
+  const pinMapWrapper   = document.getElementById('pin_map_wrapper');
+  const pinMapCloseBtn  = document.getElementById('pin_map_close');
+  let searchDebounce;
+  let pinMap, pinMarker;
+  let pinMapInitialized = false;
+
+  function updatePinFields(lat, lng, address) {
+    document.getElementById('pin_lat').value = lat;
+    document.getElementById('pin_lng').value = lng;
+    document.getElementById('pin_address').value = address || '';
+  }
+
+  function movePin(lat, lng, address, recenter = true) {
+    const latLng = [lat, lng];
+    pinMarker.setLatLng(latLng);
+    if (recenter) { pinMap.setView(latLng, 16); }
+    updatePinFields(lat, lng, address);
+  }
+
+  function reverseGeocode(lat, lng) {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(res => res.json())
+      .then(data => {
+        const address = data.display_name || '';
+        pinSearchInput.value = address;
+        updatePinFields(lat, lng, address);
+      })
+      .catch(() => updatePinFields(lat, lng, ''));
+  }
+
+  // Map is created lazily (only the first time it's needed), since initializing
+  // Leaflet inside a hidden container produces a blank/grey map.
+  function initPinMap() {
+    if (pinMapInitialized) return;
+
+    pinMap = L.map('pin_map').setView(defaultCenter, 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(pinMap);
+
+    pinMarker = L.marker(defaultCenter, { draggable: true }).addTo(pinMap);
+
+    pinMarker.on('dragend', () => {
+      const { lat, lng } = pinMarker.getLatLng();
+      reverseGeocode(lat, lng);
+    });
+
+    pinMap.on('click', (e) => {
+      pinMarker.setLatLng(e.latlng);
+      reverseGeocode(e.latlng.lat, e.latlng.lng);
+    });
+
+    pinMapInitialized = true;
+  }
+
+  function showPinMap() {
+    pinMapWrapper.classList.remove('d-none');
+    initPinMap();
+    // Nudge Leaflet to recalculate tile size now that the container is visible.
+    setTimeout(() => pinMap.invalidateSize(), 80);
+  }
+
+  function hidePinMap() {
+    pinMapWrapper.classList.add('d-none');
+  }
+
+  pinSearchInput.addEventListener('focus', () => {
+    showPinMap();
+  });
+
+  pinMapCloseBtn.addEventListener('click', () => {
+    hidePinMap();
+  });
+
+  pinSearchInput.addEventListener('input', function () {
+    clearTimeout(searchDebounce);
+    const q = this.value.trim();
+
+    if (!q) {
+      pinDropdown.classList.add('d-none');
+      pinDropdown.innerHTML = '';
+      return;
+    }
+
+    // Nominatim's usage policy caps free requests at ~1/sec — debounce keeps us well under that.
+    searchDebounce = setTimeout(() => {
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&countrycodes=pk&limit=5`)
+        .then(res => res.json())
+        .then(results => {
+          if (!results.length) {
+            pinDropdown.innerHTML = '<div class="p-3 text-muted text-center small">No matches found.</div>';
+            pinDropdown.classList.remove('d-none');
+            return;
+          }
+
+          pinDropdown.innerHTML = results.map(r => `
+            <div class="p-2 border-bottom pin-result-item" role="button"
+                 data-lat="${r.lat}" data-lon="${r.lon}" data-address="${r.display_name.replace(/"/g, '&quot;')}">
+              <small>${r.display_name}</small>
+            </div>`).join('');
+          pinDropdown.classList.remove('d-none');
+
+          pinDropdown.querySelectorAll('.pin-result-item').forEach(item => {
+            item.addEventListener('mouseenter', () => item.classList.add('bg-light'));
+            item.addEventListener('mouseleave', () => item.classList.remove('bg-light'));
+            item.addEventListener('click', () => {
+              showPinMap();
+              movePin(parseFloat(item.dataset.lat), parseFloat(item.dataset.lon), item.dataset.address);
+              pinSearchInput.value = item.dataset.address;
+              pinDropdown.classList.add('d-none');
+              pinDropdown.innerHTML = '';
+            });
+          });
+        });
+    }, 400);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#pin_location_search') && !e.target.closest('#pin_search_dropdown')) {
+      pinDropdown.classList.add('d-none');
+    }
+  });
 </script>
 
 </body>
 </html>
+
+<?= view('templates/footer') ?>

@@ -100,7 +100,7 @@ class BookingController extends BaseController
         $rows = array_map(static function (array $row) use ($patientId, $now) {
             return [
                 'fk_patient_id'    => $patientId,
-                'fk_lab_id'       => $row['fk_test_id'],
+                'fk_test_id'       => $row['fk_test_id'],
                 'status'           => 'In Process',
                 'discount_percent' => $row['discount_percent'],
                 'paid_status'      => $row['paid_status'],
