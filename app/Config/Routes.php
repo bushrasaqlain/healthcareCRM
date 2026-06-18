@@ -24,3 +24,4 @@ $routes->get('/labs/(:num)/edit',  'LabController::edit/$1');
 $routes->post('/labs/(:num)/edit', 'LabController::update/$1');
 $routes->get('/labs/(:num)/phlebotomist', 'LabController::phlebotomist/$1');
 $routes->post('/labs/(:num)/phlebotomist', 'LabController::importPhlebotomist/$1');
+$routes->post('/labs/(:num)/phlebotomist/add', 'LabController::addPhlebotomist/$1');

@@ -216,13 +216,33 @@ h4 {
 }
 
 
-.navbar { 
-  background-color: #ffffff; 
-  box-shadow: 0 2px 16px rgba(245, 245, 245, 0.1);
-  border-bottom: 3px solid #e2e8f0;
-  padding: 20px;
+nav.navbar {
+  background-color: #ffffff !important;
+  box-shadow: 0 2px 16px rgba(68,22,22,0.1) !important;
+  border-bottom: 3px solid #c9140e !important;
+  min-height: 100px;
+  padding: 8px 0 !important;
 }
 
+/* Black text, red on hover and active */
+nav.navbar .nav-link {
+  color: #111827 !important;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;  /* increase this */
+  transition: color 0.15s;
+}
+
+nav.navbar .nav-link:hover {
+  color: #c9140e !important;
+}
+
+nav.navbar .nav-link.active-tab {
+  color: #c9140e !important;
+  font-weight: 600;
+  border-bottom: 2px solid #c9140e;
+  padding-bottom: 3px;
+}
 .navbar1 { 
   background-color: #2463c2; 
   box-shadow: 0 2px 16px rgba(194, 36, 44, 0.3);
@@ -591,5 +611,8 @@ h4 {
 }
 
 .form-label {
-  color: #176CC7;
+  color: #961914;
+}
+.card {
+  background-color:#961914;
 }

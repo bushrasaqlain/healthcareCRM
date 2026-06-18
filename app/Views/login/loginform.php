@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HealthCRM - Login</title>
+  <title>Infinity+ - Login</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
   <style>
@@ -56,7 +56,7 @@
            style="width:56px; height:56px;">
         <i class="ti ti-heart-plus text-white fs-3"></i>
       </div>
-      <span class="fs-4 fw-bold text-white">Health CRM</span>
+      <span class="fs-4 fw-bold text-white">Infinity +</span>
       <small class="subtitle-muted mt-1">Home Sample Collection Management</small>
     </div>
 
@@ -82,7 +82,7 @@
             </span>
             <input type="email" name="email"
                    class="form-control input-light"
-                   placeholder="admin@healthcrm.com" required/>
+                   placeholder="admin@infinitylus.com" required/>
           </div>
         </div>
 
@@ -109,7 +109,7 @@
       </form>
 
       <p class="text-center text-muted mt-4 mb-0" style="font-size:11px;">
-        © 2026 HealthCRM · All rights reserved
+        © 2026 Infinity+ · All rights reserved
       </p>
 
     </div>

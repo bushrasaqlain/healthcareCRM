@@ -262,17 +262,42 @@ public function phlebotomist($labId)
         return redirect()->to('/lablist')->with('error', 'Lab not found.');
     }
 
-    $db           = \Config\Database::connect();
+    $db            = \Config\Database::connect();
     $phlebotomists = $db->table('phlebotomists')
                         ->where('lab_id', $labId)
                         ->get()->getResultArray();
 
     return view('dbadmin/phlebotomist', [
-        'lab'           => $lab,
-        'phlebotomists' => $phlebotomists,
+        'lab'            => $lab,
+        'phlebotomists'  => $phlebotomists,
+        'count'          => count($phlebotomists),
     ]);
 }
+public function addPhlebotomist($labId)
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
 
+    $name = $this->request->getPost('name');
+    $city = $this->request->getPost('city');
+
+    if (empty($name)) {
+        return redirect()->back()->with('error', 'Name is required.');
+    }
+
+    $db = \Config\Database::connect();
+    $db->table('phlebotomists')->insert([
+        'lab_id'     => $labId,
+        'name'       => $name,
+        'city'       => $city,
+        'status'     => 'active',
+        'created_at' => date('Y-m-d H:i:s'),
+    ]);
+
+    return redirect()->to(base_url('labs/' . $labId . '/phlebotomist'))
+                     ->with('success', 'Phlebotomist added successfully.');
+}
 public function importPhlebotomist($labId)
 {
     if (!session()->get('logged_in')) {

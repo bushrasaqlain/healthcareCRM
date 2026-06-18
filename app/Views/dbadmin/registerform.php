@@ -17,22 +17,22 @@
 </style>
 
 <div class="flex-grow-1 d-flex align-items-center justify-content-center py-4">
-  <div class="card register-card border-0 p-5" style="width:100%; max-width:900px; background-color:#176CC7;">
+  <div class="card register-card border-0 p-5" style="width:100%; max-width:900px;  ">
 
     <!-- Top header -->
     <div class="d-flex flex-column text-black align-items-center text-center px-4 pt-2 pb-3">
       <div class="rounded-circle d-flex align-items-center justify-content-center mb-3"
            style="width:56px; height:56px; background:#fff;">
-        <i class="ti ti-flask text-primary fs-3"></i>
+        <i class="ti ti-flask text-danger fs-3"></i>
       </div>
-      <span class="fs-4 fw-bold" style="color:#fff;">Health CRM</span>
+      <span class="fs-4 fw-bold" style="color:#fff;">Infinity +</span>
       <small class="mt-1" style="color:#fff;">Lab Registration Form</small>
     </div>
 
     <!-- Form section -->
     <div class="register-card-body rounded-4 p-4 mt-2 p-md-5" style="margin-top:-1.5rem;">
 
-      <h2 class="fw-bold fs-4 mb-4" style="color:#176CC7;">Register a Lab</h2>
+      <h2 class="fw-bold fs-4 mb-4" style="color:#961914;">Register a Lab</h2>
 
       <?php if (session()->getFlashdata('errors')): ?>
         <div class="alert alert-danger py-2 small">
@@ -166,7 +166,7 @@
 
         <input type="hidden" name="role" value="lab"/>
 
-        <button type="submit" class="btn text-white w-100 fw-semibold py-2 mt-2" style="background:#176CC7">
+        <button type="submit" class="btn text-white w-100 fw-semibold py-2 mt-2" style="background:#961914">
           Register Lab
         </button>
 
