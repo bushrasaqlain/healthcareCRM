@@ -37,7 +37,7 @@ public function login()
 
     // ─── Redirect based on role ───────────────────────────────
     if ($user['role'] === 'admin') {
-        return redirect()->to('/dbadmin/dashboard');
+        return redirect()->to('/dashboard');
     }
 
     return redirect()->to('/labDashboard/dashboard');
