@@ -121,5 +121,110 @@ class BookingController extends BaseController
         return redirect()->to(site_url('/labDashboard/dashboard'))
             ->with('success', count($rows) . ' test(s) booked successfully.');
     }
+
+   public function dashboard()
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
+
+    $model    = new \App\Models\PatientTestBookingModel();
+    $bookings = [];
+    $counts   = ['total'=>0,'in_process'=>0,'assigned'=>0,'arrived'=>0,'collected'=>0,'report_ready'=>0];
+
+    // Read filters from GET
+    $filters = [
+        'status'    => $this->request->getGet('status'),
+        'search'    => $this->request->getGet('search'),
+        'date_from' => $this->request->getGet('date_from'),
+        'date_to'   => $this->request->getGet('date_to'),
+    ];
+
+    try {
+        $db = \Config\Database::connect();
+
+        if ($db->tableExists('patient_test_bookings')) {
+            $bookings = $model->getFilteredBookings($filters);
+            $counts   = $model->getStatusCounts();
+            $model->attachTestDetails($bookings);
+        }
+
+    } catch (\Exception $e) {
+        log_message('error', 'Dashboard error: ' . $e->getMessage());
+    }
+
+    return view('labDashboard/dashboard', compact('bookings', 'counts', 'filters'));
+}
+
+    public function sampleCollected($id = null)
+    {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/login');
+        }
+
+        try {
+            $db = \Config\Database::connect();
+            
+            // Get booking details with patient info
+            $booking = $db->table('patient_test_bookings ptb')
+                ->select('
+                    ptb.*,
+                    p.patient_name,
+                    p.phone_number,
+                    p.age,
+                    p.gender,
+                    p.home_address,
+                    l.name as lab_name
+                ')
+                ->join('patients p', 'p.id = ptb.fk_patient_id', 'left')
+                ->join('labs l', 'l.id = ptb.fk_lab_id', 'left')
+                ->where('ptb.id', $id)
+                ->get()
+                ->getRowArray();
+
+            if (!$booking) {
+                return redirect()->to('/labDashboard/dashboard')->with('error', 'Booking not found.');
+            }
+
+            // Get tests for this booking if you have a test details table
+            $tests = [];
+            /*
+            if ($db->tableExists('booking_test_details')) {
+                $tests = $db->table('booking_test_details btd')
+                    ->select('lt.test_code, lt.test_name, lt.rate, lt.reporting_time, btd.payment_status')
+                    ->join('lab_tests lt', 'lt.id = btd.fk_test_id', 'left')
+                    ->where('btd.fk_booking_id', $id)
+                ->get()
+                ->getResultArray();
+            }
+            */
+
+            $data = [
+                'booking_id' => $booking['id'] ?? 'N/A',
+                'patient_name' => $booking['patient_name'] ?? 'N/A',
+                'phone' => $booking['phone_number'] ?? 'N/A',
+                'address' => $booking['home_address'] ?? 'N/A',
+                'gender' => $booking['gender'] ?? 'N/A',
+                'notes' => 'Sample collected notes',
+                'phlebotomist' => 'Assigned Phlebotomist',
+                'eta' => $booking['eta'] ? date('M j, Y g:i A', strtotime($booking['eta'])) : 'Not set',
+                'tests' => $tests,
+                'original_total' => '0',
+                'discount' => $booking['discount_percent'] ?? 0,
+                'patient_pays' => '0',
+                'status_history' => ['In Process', 'Phlebotomist Assigned', 'Sample Collected'],
+                'created_at' => $booking['date_created'] ? date('M j, Y g:i A', strtotime($booking['date_created'])) : 'N/A',
+                'created_by' => 'System',
+                'assigned_to' => $booking['lab_name'] ?? 'Not Assigned'
+            ];
+
+            return view('labDashboard/sample_collected', $data);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Sample collected error: ' . $e->getMessage());
+            return redirect()->to('/labDashboard/dashboard')->with('error', 'Error loading sample details.');
+        }
+    }
+
 }
    

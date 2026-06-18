@@ -31,6 +31,10 @@ $routes->get('/labs/(:num)/pricelist',  'LabController::priceList/$1');
 $routes->post('/labs/(:num)/pricelist', 'LabController::importPriceList/$1');
 
 // Lab Dashboard Routes
-$routes->get('/labDashboard/dashboard', 'LabController::dashboard');
+
+$routes->get('/labDashboard/dashboard', 'BookingController::dashboard');
 $routes->get('/labDashboard/sample_collected/(:num)', 'LabController::sampleCollected/$1');
 $routes->get('/labDashboard/sample_collected', 'LabController::sampleCollected');
+
+
+ 
