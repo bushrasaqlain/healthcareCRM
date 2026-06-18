@@ -19,3 +19,8 @@ $routes->get('/registerform', 'UserController::registerForm');
 $routes->post('/labs/store', 'UserController::registerLab');
 $routes->get('/labs/(:num)/pricelist',  'LabController::priceList/$1');
 $routes->post('/labs/(:num)/pricelist', 'LabController::importPriceList/$1');
+$routes->post('/labs/(:num)/pricelist/update', 'LabController::updatePriceList/$1');
+$routes->get('/labs/(:num)/edit',  'LabController::edit/$1');
+$routes->post('/labs/(:num)/edit', 'LabController::update/$1');
+$routes->get('/labs/(:num)/phlebotomist', 'LabController::phlebotomist/$1');
+$routes->post('/labs/(:num)/phlebotomist', 'LabController::importPhlebotomist/$1');

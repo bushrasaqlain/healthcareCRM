@@ -13,13 +13,11 @@
   .register-card-body {
     background-color: #fff;
   }
-  .form-label {
-    color: #1c4f63;
-  }
+
 </style>
 
 <div class="flex-grow-1 d-flex align-items-center justify-content-center py-4">
-  <div class="card register-card border-0 p-5" style="width:100%; max-width:900px; background-color:#134557;">
+  <div class="card register-card border-0 p-5" style="width:100%; max-width:900px; background-color:#176CC7;">
 
     <!-- Top header -->
     <div class="d-flex flex-column text-black align-items-center text-center px-4 pt-2 pb-3">
@@ -34,7 +32,7 @@
     <!-- Form section -->
     <div class="register-card-body rounded-4 p-4 mt-2 p-md-5" style="margin-top:-1.5rem;">
 
-      <h2 class="fw-bold fs-4 mb-4" style="color:#1c4f63;">Register a Lab</h2>
+      <h2 class="fw-bold fs-4 mb-4" style="color:#176CC7;">Register a Lab</h2>
 
       <?php if (session()->getFlashdata('errors')): ?>
         <div class="alert alert-danger py-2 small">
@@ -76,22 +74,24 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium">Email Address</label>
-            <div class="input-group">
-              <span class="input-group-text input-group-text-light"><i class="ti ti-mail"></i></span>
-              <input type="email" name="email" class="form-control input-light"
-                     placeholder="lab@healthcrm.com" value="<?= old('email') ?>" required/>
-            </div>
-          </div>
+  <label class="form-label fw-medium">Email Address</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light"><i class="ti ti-mail"></i></span>
+    <input type="email" name="email" id="email" class="form-control input-light"
+           placeholder="lab@healthcrm.com" value="<?= old('email') ?>" required/>
+  </div>
+  <small class="text-danger d-none" id="email-error">Enter a valid email address.</small>
+</div>
 
-          <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium">Phone Number</label>
-            <div class="input-group">
-              <span class="input-group-text input-group-text-light"><i class="ti ti-phone"></i></span>
-              <input type="text" name="phone" class="form-control input-light"
-                     placeholder="03XX-XXXXXXX" value="<?= old('phone') ?>"/>
-            </div>
-          </div>
+         <div class="col-md-6 mb-3">
+  <label class="form-label fw-medium">Phone Number</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light"><i class="ti ti-phone"></i></span>
+    <input type="text" name="phone" id="phone" class="form-control input-light"
+           placeholder="03XX-XXXXXXX or 0XX-XXXXXXX" value="<?= old('phone') ?>" maxlength="12"/>
+  </div>
+  <small class="text-danger d-none" id="phone-error">Enter a valid Pakistani mobile (03XX-XXXXXXX) or landline (0XX-XXXXXXX) number.</small>
+</div>
 
           <div class="col-md-6 mb-3">
             <label class="form-label fw-medium">License Number</label>
@@ -111,7 +111,7 @@
             </div>
           </div>
 
-          <div class="col-md-6 mb-3">
+          <!-- <div class="col-md-6 mb-3">
             <label class="form-label fw-medium">Password</label>
             <div class="input-group">
               <span class="input-group-text input-group-text-light"><i class="ti ti-lock"></i></span>
@@ -133,13 +133,40 @@
                 <i class="ti ti-eye" id="eye-icon-2"></i>
               </button>
             </div>
-          </div>
+          </div> -->
+<div class="col-md-6 mb-3">
+  <label class="form-label fw-medium">Password</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light"><i class="ti ti-lock"></i></span>
+    <input type="password" name="password" id="password" class="form-control input-light"
+           placeholder="••••••••" required/>
+    <button type="button" class="btn input-group-text-light" onclick="togglePw('password','eye-icon-1')">
+      <i class="ti ti-eye" id="eye-icon-1"></i>
+    </button>
+  </div>
+  <ul class="list-unstyled small mt-2 mb-0 d-none" id="pw-checklist">
+    <li id="pw-length" class="text-muted">Minimum 8 characters, including uppercase and lowercase letters, a number, and a special character.</li>
+   
+  </ul>
+</div>
 
+<div class="col-md-6 mb-3">
+  <label class="form-label fw-medium">Confirm Password</label>
+  <div class="input-group">
+    <span class="input-group-text input-group-text-light"><i class="ti ti-lock"></i></span>
+    <input type="password" name="confirm_password" id="confirm_password" class="form-control input-light"
+           placeholder="••••••••" required/>
+    <button type="button" class="btn input-group-text-light" onclick="togglePw('confirm_password','eye-icon-2')">
+      <i class="ti ti-eye" id="eye-icon-2"></i>
+    </button>
+  </div>
+  <small class="text-danger d-none" id="pw-mismatch">Passwords do not match</small>
+</div>
         </div>
 
         <input type="hidden" name="role" value="lab"/>
 
-        <button type="submit" class="btn text-white w-100 fw-semibold py-2 mt-2" style="background:#134557">
+        <button type="submit" class="btn text-white w-100 fw-semibold py-2 mt-2" style="background:#176CC7">
           Register Lab
         </button>
 
@@ -160,7 +187,84 @@
     inp.type   = inp.type === 'password' ? 'text' : 'password';
     icon.className = inp.type === 'password' ? 'ti ti-eye' : 'ti ti-eye-off';
   }
+
+  const phoneField   = document.getElementById('phone');
+  const phoneError   = document.getElementById('phone-error');
+  const phonePattern = /^(03\d{2}-\d{7}|0(?!3)\d{2}-\d{7})$/;
+
+  // Auto-format phone as mobile (4-7 split) or landline (3-7 split)
+  phoneField.addEventListener('input', function () {
+    let digits = this.value.replace(/\D/g, '');
+    const isMobile = digits.length < 2 || digits[1] === '3';
+    const maxLen = isMobile ? 11 : 10;
+    digits = digits.slice(0, maxLen);
+
+    const splitAt = isMobile ? 4 : 3;
+    this.value = digits.length > splitAt
+      ? digits.slice(0, splitAt) + '-' + digits.slice(splitAt)
+      : digits;
+
+    // Hide the error as soon as it becomes valid, even before blur
+    if (phonePattern.test(this.value)) phoneError.classList.add('d-none');
+  });
+
+  // Final check when the user leaves the field
+  phoneField.addEventListener('blur', function () {
+    const valid = this.value === '' || phonePattern.test(this.value);
+    phoneError.classList.toggle('d-none', valid);
+  });
+
+  const emailField = document.getElementById('email');
+  const emailError = document.getElementById('email-error');
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  emailField.addEventListener('input', function () {
+    if (emailPattern.test(this.value)) emailError.classList.add('d-none');
+  });
+
+  emailField.addEventListener('blur', function () {
+    const valid = this.value === '' || emailPattern.test(this.value);
+    emailError.classList.toggle('d-none', valid);
+  });
+
+  // Password checklist + match check
+  const pwField       = document.getElementById('password');
+  const confirmField  = document.getElementById('confirm_password');
+  const pwChecklist   = document.getElementById('pw-checklist');
+
+  function setCheck(id, ok) {
+    const el = document.getElementById(id);
+    el.classList.toggle('text-success', ok);
+    el.classList.toggle('text-muted', !ok);
+    el.querySelector('i').className = ok ? 'ti ti-check me-1' : 'ti ti-x me-1';
+  }
+
+  pwField.addEventListener('focus', function () {
+    pwChecklist.classList.remove('d-none');
+  });
+
+  pwField.addEventListener('blur', function () {
+    const allValid = document.querySelectorAll('#pw-checklist .text-success').length === 5;
+    if (allValid) pwChecklist.classList.add('d-none');
+  });
+
+  pwField.addEventListener('input', function () {
+    const pw = this.value;
+    setCheck('pw-length', pw.length >= 8);
+    setCheck('pw-upper', /[A-Z]/.test(pw));
+    setCheck('pw-lower', /[a-z]/.test(pw));
+    setCheck('pw-number', /\d/.test(pw));
+    setCheck('pw-special', /[^A-Za-z0-9]/.test(pw));
+    checkMatch();
+  });
+
+  function checkMatch() {
+    const mismatch = confirmField.value.length > 0 && confirmField.value !== pwField.value;
+    document.getElementById('pw-mismatch').classList.toggle('d-none', !mismatch);
+  }
+  confirmField.addEventListener('input', checkMatch);
 </script>
 
 <?= view('templates/footer') ?>
 </html>
+
