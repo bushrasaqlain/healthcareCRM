@@ -15,7 +15,7 @@
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid px-4">
 
-<a class="navbar-brand d-flex align-items-center gap-2" href="<?= base_url('dashboard') ?>">
+<a class="navbar-brand d-flex align-items-center gap-2" href="<?= base_url('dbadmin/dashboard') ?>">
   <div class="d-flex flex-column" style="line-height:1;">
     <img src="<?= base_url('assets/images/12.png') ?>" alt="Infinity Healthcare" height="60" width="140"/>
     <small style="font-size:11px; color:#000; letter-spacing:0.5px; margin:2px;">by infinityhealthpk.com</small>
@@ -69,7 +69,7 @@
 
         <li class="nav-item">
           <a href="<?= base_url('auth/logout') ?>"
-             class="btn bg-danger text-white d-flex align-items-center gap-1">
+             class="btn-new-booking text-white d-flex align-items-center gap-1">
             <i class="ti ti-logout"></i> Logout
           </a>
         </li>
