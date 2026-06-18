@@ -33,8 +33,12 @@ $routes->post('/labs/(:num)/pricelist', 'LabController::importPriceList/$1');
 // Lab Dashboard Routes
 
 $routes->get('/labDashboard/dashboard', 'BookingController::dashboard');
-$routes->get('/labDashboard/sample_collected/(:num)', 'LabController::sampleCollected/$1');
-$routes->get('/labDashboard/sample_collected', 'LabController::sampleCollected');
+$routes->get('/booking/view/(:num)', 'BookingController::viewBooking/$1');
 
-
+// Invoice routes
+// Booking routes
+$routes->get('booking/invoice/(:num)', 'BookingController::viewInvoice/$1');
+$routes->get('booking/sharedInvoice/(:num)/(:any)', 'BookingController::sharedInvoice/$1/$2');
+$routes->post('booking/generateShareLink/(:num)', 'BookingController::generateShareLink/$1');
+$routes->post('booking/regenerateShareLink/(:num)', 'BookingController::regenerateShareLink/$1');
  

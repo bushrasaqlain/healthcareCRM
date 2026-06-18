@@ -16,6 +16,7 @@ class PatientTestBookingModel extends Model
         'eta',
         'discount_percent',
         'paid_status',
+        'invoice_no'
     ];
 
     protected $returnType    = 'array';
@@ -32,156 +33,186 @@ class PatientTestBookingModel extends Model
         'paid_status'   => 'required|in_list[cash,prepaid]',
     ];
 
-    // ─── Dashboard ────────────────────────────────────────────────
-
-    /**
-     * Get all bookings joined with patient info, newest first.
-     */
-    public function getBookingsWithPatient(): array
+    // Get filtered bookings for dashboard
+    public function getFilteredBookings(array $filters = []): array
     {
-        return $this->select('
-                patient_test_bookings.id,
-                patient_test_bookings.fk_patient_id,
-                patient_test_bookings.fk_lab_id,
-                patient_test_bookings.status,
-                patient_test_bookings.eta,
-                patient_test_bookings.discount_percent,
-                patient_test_bookings.paid_status,
-                patient_test_bookings.date_created,
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('patient_test_bookings ptb')
+            ->select('
+                MIN(ptb.id) as id,
+                ptb.fk_patient_id,
+                ptb.status,
+                ptb.eta,
+                ptb.paid_status,
+                ptb.date_created,
                 p.patient_name,
                 p.phone_number,
                 p.age,
                 p.gender,
-                p.home_address
+                p.home_address,
+                COUNT(ptb.id) as test_count,
+                SUM(lt.rate) as total,
+                lt.reporting_time,
+                SUM(lt.rate * (1 - ptb.discount_percent / 100)) as payable
             ')
-            ->join('patients p', 'p.id = patient_test_bookings.fk_patient_id', 'left')
-            ->orderBy('patient_test_bookings.date_created', 'DESC')
-            ->findAll();
+            ->join('patients p', 'p.id = ptb.fk_patient_id', 'left')
+            ->join('lab_tests lt', 'lt.id = ptb.fk_test_id', 'left')
+            ->groupBy('ptb.fk_patient_id, ptb.status, DATE(ptb.date_created)');
+
+        if (!empty($filters['status']) && $filters['status'] !== 'All') {
+            $builder->where('ptb.status', $filters['status']);
+        }
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $builder->groupStart()
+                        ->like('p.patient_name', $search)
+                        ->orLike('p.phone_number', $search)
+                    ->groupEnd();
+        }
+
+        if (!empty($filters['date_from'])) {
+            $builder->where('DATE(ptb.date_created) >=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $builder->where('DATE(ptb.date_created) <=', $filters['date_to']);
+        }
+
+        return $builder->orderBy('ptb.date_created', 'DESC')->get()->getResultArray();
     }
 
-    /**
-     * Count bookings grouped by status for dashboard cards.
-     * Returns associative array: ['total', 'in_process', 'assigned', 'arrived', 'collected', 'report_ready']
-     */
+    // Attach test details to bookings
+    public function attachTestDetails(array &$bookings): void
+    {
+        if (empty($bookings)) return;
+
+        $db = \Config\Database::connect();
+
+        $patientIds = array_unique(array_column($bookings, 'fk_patient_id'));
+
+        $rows = $db->table('patient_test_bookings ptb')
+            ->select('ptb.fk_patient_id, lt.test_name, lt.rate, lt.reporting_time, ptb.discount_percent')
+            ->join('lab_tests lt', 'lt.id = ptb.fk_test_id', 'left')
+            ->whereIn('ptb.fk_patient_id', $patientIds)
+            ->get()->getResultArray();
+
+        $testMap = [];
+        foreach ($rows as $row) {
+            $testMap[$row['fk_patient_id']][] = $row;
+        }
+
+        foreach ($bookings as &$b) {
+            $b['tests'] = $testMap[$b['fk_patient_id']] ?? [];
+        }
+    }
+
+    // Get status counts for dashboard
     public function getStatusCounts(): array
     {
-        $rows = $this->select('status, COUNT(*) as cnt')
-                     ->groupBy('status')
-                     ->findAll();
-
-        $map = [
-            'In Process'             => 'in_process',
-            'Phlebotomist Assigned'  => 'assigned',
-            'Arrived'                => 'arrived',
-            'Sample Collected'       => 'collected',
-            'Report Ready'           => 'report_ready',
-        ];
+        $db = \Config\Database::connect();
+        $result = $db->table('patient_test_bookings')
+            ->select('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()->getResultArray();
 
         $counts = [
-            'total'        => 0,
-            'in_process'   => 0,
-            'assigned'     => 0,
-            'arrived'      => 0,
-            'collected'    => 0,
-            'report_ready' => 0,
+            'total' => 0,
+            'in_process' => 0,
+            'assigned' => 0,
+            'arrived' => 0,
+            'collected' => 0,
+            'report_ready' => 0
         ];
 
-        foreach ($rows as $row) {
-            $counts['total'] += (int) $row['cnt'];
-            $key = $map[$row['status']] ?? null;
-            if ($key) {
-                $counts[$key] = (int) $row['cnt'];
+        foreach ($result as $row) {
+            $status = strtolower($row['status']);
+            $counts['total'] += (int)$row['count'];
+            
+            if ($status === 'in process') {
+                $counts['in_process'] = (int)$row['count'];
+            } elseif ($status === 'phlebotomist assigned') {
+                $counts['assigned'] = (int)$row['count'];
+            } elseif ($status === 'phlebotomist arrived') {
+                $counts['arrived'] = (int)$row['count'];
+            } elseif ($status === 'sample collected') {
+                $counts['collected'] = (int)$row['count'];
+            } elseif ($status === 'report ready') {
+                $counts['report_ready'] = (int)$row['count'];
             }
         }
 
         return $counts;
     }
 
-    // ─── Test Details (booking_test_details table) ────────────────
-
-    /**
-     * Get tests for a single booking with test name, rate, etc.
-     * Requires booking_test_details + lab_tests tables.
-     */
-    public function getTestsByBookingId(int $bookingId): array
+    // Get booking with details for invoice
+    public function getBookingWithDetails($bookingId)
     {
         $db = \Config\Database::connect();
-
-        if (!$db->tableExists('booking_test_details')) {
-            return [];
+        
+        // First get the booking
+        $booking = $db->table('patient_test_bookings')
+            ->where('id', $bookingId)
+            ->get()
+            ->getRowArray();
+            
+        if (!$booking) {
+            return null;
         }
+        
+        // Get patient details
+        $patient = $db->table('patients')
+            ->where('id', $booking['fk_patient_id'])
+            ->get()
+            ->getRowArray();
+            
+        $booking['patient'] = $patient;
+        
+        // Get all tests for this booking
+        $tests = $db->table('patient_test_bookings ptb')
+            ->select('ptb.*, lt.test_name, lt.test_code, lt.rate as rack_rate, lt.reporting_time')
+            ->join('lab_tests lt', 'lt.id = ptb.fk_test_id', 'left')
+            ->where('ptb.id', $bookingId)
+            ->get()
+            ->getResultArray();
+            
+        $booking['tests'] = $tests;
+        
+        return $booking;
+    }
 
-        return $db->table('booking_test_details btd')
-            ->select('lt.test_name, lt.rate, lt.reporting_time, lt.test_code')
-            ->join('lab_tests lt', 'lt.id = btd.fk_test_id', 'left')
-            ->where('btd.fk_booking_id', $bookingId)
+    // Get tests by booking ID
+    public function getTestsByBookingId($bookingId)
+    {
+        $db = \Config\Database::connect();
+        
+        return $db->table('patient_test_bookings ptb')
+            ->select('
+                ptb.*,
+                lt.test_name,
+                lt.test_code,
+                lt.rate as rack_rate,
+                lt.reporting_time,
+                (lt.rate * ptb.discount_percent / 100) as discount_amt,
+                (lt.rate - (lt.rate * ptb.discount_percent / 100)) as patient_price
+            ')
+            ->join('lab_tests lt', 'lt.id = ptb.fk_test_id', 'left')
+            ->where('ptb.id', $bookingId)
             ->get()
             ->getResultArray();
     }
 
-    /**
-     * Attach tests + calculated totals to each booking row.
-     * Mutates the passed array in place.
-     */
-    public function attachTestDetails(array &$bookings): void
+    // Get all bookings for a patient
+    public function getBookingsByPatientId($patientId)
     {
-        foreach ($bookings as &$booking) {
-            $tests    = $this->getTestsByBookingId((int) $booking['id']);
-            $total    = array_sum(array_column($tests, 'rate'));
-            $discount = ($booking['discount_percent'] / 100) * $total;
-
-            $booking['tests']      = $tests;
-            $booking['test_count'] = count($tests);
-            $booking['total']      = $total;
-            $booking['discount']   = $discount;
-            $booking['payable']    = $total - $discount;
-        }
+        $db = \Config\Database::connect();
+        
+        return $db->table('patient_test_bookings ptb')
+            ->select('ptb.*, lt.test_name, lt.test_code, lt.rate')
+            ->join('lab_tests lt', 'lt.id = ptb.fk_test_id', 'left')
+            ->where('ptb.fk_patient_id', $patientId)
+            ->orderBy('ptb.date_created', 'DESC')
+            ->get()
+            ->getResultArray();
     }
-
-    /**
- * Get bookings with patient info, applying optional filters.
- */
-public function getFilteredBookings(array $filters = []): array
-{
-    $builder = $this->select('
-            patient_test_bookings.id,
-            patient_test_bookings.fk_patient_id,
-            patient_test_bookings.fk_lab_id,
-            patient_test_bookings.status,
-            patient_test_bookings.eta,
-            patient_test_bookings.discount_percent,
-            patient_test_bookings.paid_status,
-            patient_test_bookings.date_created,
-            p.patient_name,
-            p.phone_number,
-            p.age,
-            p.gender,
-            p.home_address
-        ')
-        ->join('patients p', 'p.id = patient_test_bookings.fk_patient_id', 'left');
-
-    // Status filter
-    if (!empty($filters['status']) && $filters['status'] !== 'All') {
-        $builder->where('patient_test_bookings.status', $filters['status']);
-    }
-
-    // Search filter (patient name or phone)
-    if (!empty($filters['search'])) {
-        $search = $filters['search'];
-        $builder->groupStart()
-                    ->like('p.patient_name', $search)
-                    ->orLike('p.phone_number', $search)
-                ->groupEnd();
-    }
-
-    // Date range filter (on date_created)
-    if (!empty($filters['date_from'])) {
-        $builder->where('DATE(patient_test_bookings.date_created) >=', $filters['date_from']);
-    }
-    if (!empty($filters['date_to'])) {
-        $builder->where('DATE(patient_test_bookings.date_created) <=', $filters['date_to']);
-    }
-
-    return $builder->orderBy('patient_test_bookings.date_created', 'DESC')->findAll();
-}
 }
