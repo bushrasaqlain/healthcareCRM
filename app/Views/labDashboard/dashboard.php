@@ -4,7 +4,6 @@
 
   <!-- Page Header -->
   <div class="page-header">
-
     <a href="<?= base_url('booking/new') ?>" class="btn-new-booking">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="12" y1="5" x2="12" y2="19" />
@@ -50,9 +49,8 @@
         <circle cx="12" cy="7" r="4" />
       </svg>
       Individual Leads
-      <span class="tab-badge" id="tab-count-individual"><?= $counts['total'] ?></span>
+      <span class="tab-badge" id="tab-count-individual"><?= $counts['total'] - $counts['report_ready'] ?></span>
     </a>
-
   </div>
 
   <!-- Filter Bar — inputs now submit via GET -->
@@ -122,7 +120,17 @@
         </tr>
       </thead>
       <tbody>
-        <?php if (empty($bookings)): ?>
+        <?php 
+        // Filter out Report Ready bookings when "All" is selected
+        $displayBookings = $bookings;
+        $activeStatus = $filters['status'] ?? 'All';
+        if ($activeStatus === 'All' || empty($activeStatus)) {
+            $displayBookings = array_filter($bookings, function($b) {
+                return $b['status'] !== 'Report Ready';
+            });
+        }
+        
+        if (empty($displayBookings)): ?>
           <tr>
             <td colspan="8" class="empty-state">
               <p>No bookings match your filters.</p>
@@ -138,7 +146,7 @@
             'In Process'            => 'in-process',
             'Refused'               => 'refused',
           ];
-          foreach ($bookings as $b):
+          foreach ($displayBookings as $b):
             $sc        = $statusClassMap[$b['status']] ?? 'in-process';
             $total     = $b['total'] ?? 0;
             $payable   = $b['payable'] ?? 0;
@@ -227,7 +235,6 @@
       e.currentTarget.classList.add('active');
     }
   </script>
-
 
   <style>
     .btn-new-booking {

@@ -44,10 +44,19 @@ class CreatePatientTestsBooking extends Migration
             'discount_percent' => [
                 'type'       => 'INT',
             ],
-            'paid_status' => [
+            'payment_method' => [
                 'type'       => 'ENUM',
                 'constraint' => ['cash', 'prepaid'],
                 'default'    => 'prepaid',
+            ],
+             'payment_status' => [
+                'type'       => 'ENUM',
+                'constraint' => ['paid', 'unpaid'],
+                'default'    => 'unpaid',
+            ],
+             'payment_date' => [
+                'type' => 'DATETIME',
+                'null' => true,
             ],
             'date_created' => [
                 'type' => 'DATETIME',

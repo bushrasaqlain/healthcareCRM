@@ -51,4 +51,7 @@ $routes->get('booking/invoice/(:num)', 'BookingController::viewInvoice/$1');
 $routes->get('booking/sharedInvoice/(:num)/(:any)', 'BookingController::sharedInvoice/$1/$2');
 $routes->post('booking/generateShareLink/(:num)', 'BookingController::generateShareLink/$1');
 $routes->post('booking/regenerateShareLink/(:num)', 'BookingController::regenerateShareLink/$1');
+ $routes->get('booking/status/(:num)/(:any)', 'BookingController::updateStatus/$1/$2');
+ $routes->post('booking/uploadReport/(:num)', 'BookingController::uploadReport/$1');
  
+$routes->post('booking/markPaymentPaid/(:num)', 'BookingController::markPaymentPaid/$1');

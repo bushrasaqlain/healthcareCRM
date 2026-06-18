@@ -219,7 +219,7 @@ body{
             Print Invoice
         </button>
 
-        <button onclick="openShareModal()" class="btn-action btn-share">
+        <button onclick="shareInvoice()" class="btn-action btn-share">
             Share Invoice
         </button>
 
@@ -263,8 +263,8 @@ body{
                     Issued <?= esc($issuedDate) ?>
                 </div>
 
-                <span class="status-badge <?= ($booking['paid_status'] == 'prepaid') ? 'status-paid' : 'status-unpaid' ?>">
-                    <?= ($booking['paid_status'] == 'prepaid') ? 'PAID' : 'UNPAID' ?>
+                <span class="status-badge <?= ($booking['payment_status'] == 'paid') ? 'status-paid' : 'status-unpaid' ?>">
+                    <?= ($booking['payment_status'] == 'paid') ? 'PAID' : 'UNPAID' ?>
                 </span>
 
             </div>
@@ -334,7 +334,7 @@ body{
 
                     <div class="info-row">
                         <strong>Payment:</strong>
-                        <?= ucfirst($booking['paid_status']) ?>
+                        <?= ucfirst($booking['payment_status']) ?>
                     </div>
 
                 </div>
@@ -435,9 +435,9 @@ body{
     <div class="summary-row">
         <span>Total Discount</span>
 
-        <span style="color:#dc2626;">
+       <span class="discount-value">
             - PKR <?= number_format($discountTotal) ?>
-        </span>
+       </span>
     </div>
 
     <?php endif; ?>
@@ -464,6 +464,16 @@ body{
     justify-content:space-between;
     padding:10px 0;
     font-size:15px;
+    color:#111827;
+}
+
+.summary-row span:first-child{
+    color:#111827;
+}
+
+.discount-value{
+    color:#dc2626 !important;
+    font-weight:600;
 }
 
 .grand-total{
@@ -551,43 +561,6 @@ body{
     </div>
 </div>
 
-<!-- SHARE MODAL -->
-
-<div class="modal-overlay" id="shareModal">
-
-    <div class="modal-content">
-
-        <button class="modal-close"
-                onclick="closeShareModal()">
-            ×
-        </button>
-
-        <h2>Share Invoice</h2>
-
-        <p>
-            Generate and share a secure invoice link.
-        </p>
-
-        <div class="share-link-wrap">
-
-            <input
-                type="text"
-                id="shareLink"
-                readonly>
-
-            <button onclick="copyLink()">
-                Copy
-            </button>
-
-        </div>
-
-        <div id="copiedMessage">
-            Link copied successfully
-        </div>
-
-    </div>
-
-</div>
 
 <style>
 .modal-overlay{
@@ -651,51 +624,53 @@ body{
 
 <script>
 
-function openShareModal(){
 
-    document.getElementById('shareModal').style.display='flex';
 
-    fetch(
-        '<?= base_url("booking/generateShareLink/".$booking["id"]) ?>',
-        {
-            method:'POST'
+async function shareInvoice() {
+
+    try {
+
+        const response = await fetch(
+            '<?= base_url("booking/generateShareLink/".$booking["id"]) ?>',
+            {
+                method: 'POST'
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert('Unable to generate share link');
+            return;
         }
-    )
-    .then(res => res.json())
-    .then(data => {
 
-        if(data.success){
+        const shareUrl = data.share_url;
 
-            document.getElementById('shareLink').value =
-                data.share_url;
+        // Native Share Popup
+        if (navigator.share) {
+
+            await navigator.share({
+                title: 'Invoice #<?= esc($invoiceNumber) ?>',
+                text: 'View your invoice online',
+                url: shareUrl
+            });
+
+        } else {
+
+            // Fallback for unsupported browsers
+            await navigator.clipboard.writeText(shareUrl);
+            alert('Share not supported. Link copied to clipboard.');
+
         }
-    });
+
+    } catch (error) {
+
+        console.error(error);
+        alert('Something went wrong');
+
+    }
 }
 
-function closeShareModal(){
-
-    document.getElementById('shareModal').style.display='none';
-}
-
-function copyLink(){
-
-    const input =
-        document.getElementById('shareLink');
-
-    input.select();
-
-    navigator.clipboard.writeText(input.value);
-
-    document.getElementById('copiedMessage')
-        .style.display='block';
-
-    setTimeout(function(){
-
-        document.getElementById('copiedMessage')
-            .style.display='none';
-
-    },3000);
-}
 
 window.onclick = function(event){
 
