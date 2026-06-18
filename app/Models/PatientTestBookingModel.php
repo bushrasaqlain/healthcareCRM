@@ -11,7 +11,6 @@ class PatientTestBookingModel extends Model
     protected $allowedFields = [
         'fk_patient_id',
         'fk_test_id',
-        'fk_lab_id',
         'status',
         'eta',
         'discount_percent',
@@ -28,6 +27,7 @@ class PatientTestBookingModel extends Model
 
     protected $validationRules = [
         'fk_patient_id' => 'required|integer',
+        'fk_test_id'    => 'required|integer',
         'fk_test_id'    => 'required|integer',
         'status'        => 'required',
         'paid_status'   => 'required|in_list[cash,prepaid]',

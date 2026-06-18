@@ -145,8 +145,11 @@
     </button>
   </div>
   <ul class="list-unstyled small mt-2 mb-0 d-none" id="pw-checklist">
-    <li id="pw-length" class="text-muted">Minimum 8 characters, including uppercase and lowercase letters, a number, and a special character.</li>
-   
+    <li id="pw-length" class="text-muted"><i class="ti ti-x me-1"></i>At least 8 characters</li>
+    <li id="pw-upper" class="text-muted"><i class="ti ti-x me-1"></i>One uppercase letter</li>
+    <li id="pw-lower" class="text-muted"><i class="ti ti-x me-1"></i>One lowercase letter</li>
+    <li id="pw-number" class="text-muted"><i class="ti ti-x me-1"></i>One number</li>
+    <li id="pw-special" class="text-muted"><i class="ti ti-x me-1"></i>One special character</li>
   </ul>
 </div>
 

@@ -4,9 +4,9 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreatePatientTestsBookingTable extends Migration
+class CreatePatientTestsBooking extends Migration
 {
-     public function up()
+    public function up()
     {
         $this->forge->addField([
             'id' => [
@@ -19,7 +19,7 @@ class CreatePatientTestsBookingTable extends Migration
                 // below once that table exists.
                 'type'       => 'INT',
             ],
-            'fk_lab_id' => [
+            'fk_test_id' => [
                 // References tests.id (the tests table already exists).
                 'type'       => 'INT',
                 'constraint' => 11,
@@ -61,13 +61,13 @@ class CreatePatientTestsBookingTable extends Migration
 
         $this->forge->addPrimaryKey('id');
         $this->forge->addKey('fk_patient_id');
-        $this->forge->addKey('fk_lab_id');
+        $this->forge->addKey('fk_test_id');
 
         // Enabled now since tests already exists.
         // onUpdate CASCADE keeps things in sync if a test's id ever changes;
         // onDelete RESTRICT stops a test from being deleted while it's
         // still referenced by a booking, protecting historical records.
-        $this->forge->addForeignKey('fk_lab_id', 'lab_tests', 'id', 'CASCADE', 'RESTRICT');
+        $this->forge->addForeignKey('fk_test_id', 'lab_tests', 'id', 'CASCADE', 'RESTRICT');
 
         // Uncomment once a patients table exists, adjusting the table/column
         // names below if yours differ.
