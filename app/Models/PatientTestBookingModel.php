@@ -11,12 +11,13 @@ class PatientTestBookingModel extends Model
     protected $allowedFields = [
         'fk_patient_id',
         'fk_test_id',
-        'fk_lab_id',
         'status',
         'eta',
         'discount_percent',
-        'paid_status',
-        'invoice_no'
+        'payment_method',
+        'payment_status',
+        'payment_date',
+        'phleb_id',
     ];
 
     protected $returnType    = 'array';
@@ -25,12 +26,14 @@ class PatientTestBookingModel extends Model
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'date_created';
     protected $updatedField  = 'date_updated';
-
+    protected $payment_date='payment_date';
     protected $validationRules = [
         'fk_patient_id' => 'required|integer',
         'fk_test_id'    => 'required|integer',
         'status'        => 'required',
-        'paid_status'   => 'required|in_list[cash,prepaid]',
+        'payment_method' => 'required|in_list[cash,prepaid]',
+        'payment_status' => 'required|in_list[paid,unpaid]',
+        
     ];
 
     // Get filtered bookings for dashboard
@@ -44,7 +47,8 @@ class PatientTestBookingModel extends Model
                 ptb.fk_patient_id,
                 ptb.status,
                 ptb.eta,
-                ptb.paid_status,
+                ptb.payment_method,
+                ptb.payment_status,
                 ptb.date_created,
                 p.patient_name,
                 p.phone_number,
@@ -214,5 +218,14 @@ class PatientTestBookingModel extends Model
             ->orderBy('ptb.date_created', 'DESC')
             ->get()
             ->getResultArray();
+    }
+
+    // Update payment status
+    public function updatePaymentStatus($bookingId, $status)
+    {
+        return $this->update($bookingId, [
+            'payment_status' => $status,
+            'date_updated' => date('Y-m-d H:i:s')
+        ]);
     }
 }

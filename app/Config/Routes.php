@@ -49,4 +49,13 @@ $routes->post('booking/generateShareLink/(:num)', 'BookingController::generateSh
 $routes->post('booking/regenerateShareLink/(:num)', 'BookingController::regenerateShareLink/$1');
 $routes->get('booking/editTests/(:num)',    'BookingController::editTests/$1');
 $routes->post('booking/updateTests/(:num)', 'BookingController::updateTests/$1');
+ $routes->get('booking/status/(:num)/(:any)', 'BookingController::updateStatus/$1/$2');
+ $routes->post('booking/uploadReport/(:num)', 'BookingController::uploadReport/$1');
  
+$routes->post('booking/markPaymentPaid/(:num)', 'BookingController::markPaymentPaid/$1');
+
+$routes->post('booking/saveNotes/(:num)', 'BookingController::saveNotes/$1');
+$routes->get('booking/editTests/(:num)',    'BookingController::editTests/$1');
+$routes->post('booking/updateTests/(:num)', 'BookingController::updateTests/$1');
+ $routes->post('booking/assignPhlebotomist/(:num)', 'BookingController::assignPhlebotomist/$1');
+ $routes->get('/labDashboard/pricelist', 'LabController::labPriceList');

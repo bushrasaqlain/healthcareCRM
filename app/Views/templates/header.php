@@ -34,11 +34,11 @@
 
         <?php if ($userRole === 'admin'): ?>
           <li class="nav-item">
-            <a class="nav-link text-dark <?= $activePage === 'lablist' ? 'active-tab' : '' ?>"
+            <a class="nav-link text-dark <?= $activePage === 'dashboard' ? 'active-tab' : '' ?>"
                href="<?= base_url('lablist') ?>">Lab List</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-dark <?= $activePage === 'register' ? 'active-tab' : '' ?>"
+            <a class="nav-link text-dark <?= $activePage === 'pricelist' ? 'active-tab' : '' ?>"
                href="<?= base_url('registerform') ?>">Register</a>
           </li>
         <?php endif; ?>
@@ -47,15 +47,15 @@
           <li class="nav-item">
             <a class="nav-link text-dark <?= $activePage === 'dashboard' ? 'active-tab' : '' ?>"
                href="<?= base_url('labDashboard/dashboard') ?>">
-              <i class="ti ti-dashboard"></i> Dashboard
+              Dashboard
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-dark <?= $activePage === 'tests' ? 'active-tab' : '' ?>"
-               href="<?= base_url('tests') ?>">
-              <i class="ti ti-flask"></i> Tests
+            <a class="nav-link text-dark d-flex align-items-center gap-1 <?= $activePage === 'pricelist' ? 'active-tab' : '' ?>" 
+              href="<?= base_url('labDashboard/pricelist') ?>">
+                Price List
             </a>
-          </li>
+        </li>
         <?php endif; ?>
 
         <!-- Divider -->

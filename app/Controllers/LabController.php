@@ -340,4 +340,31 @@ public function importPhlebotomist($labId)
         return redirect()->back()->with('error', 'Failed to read file: ' . $e->getMessage());
     }
 }
+public function labPriceList()
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
+
+    // Session se lab user ka user_id lo
+    $userId = session()->get('user_id');
+
+    $db  = \Config\Database::connect();
+
+    $lab = $db->table('labs')->where('user_id', $userId)->get()->getRowArray();
+
+    if (!$lab) {
+        return redirect()->to('/labDashboard/dashboard')->with('error', 'Lab not found.');
+    }
+
+    $tests = $db->table('lab_tests')
+                ->where('lab_id', $lab['id'])
+                ->orderBy('test_name', 'ASC')
+                ->get()->getResultArray();
+
+    return view('labDashboard/pricelist', [
+        'lab'   => $lab,
+        'tests' => $tests,
+    ]);
+}
 }

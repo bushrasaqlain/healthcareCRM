@@ -128,8 +128,8 @@
               </td>
               <td style="text-align:center">
                 <select class="tbl-sl" name="existing[<?= $b['id'] ?>][payment]">
-                  <option value="cash"    <?= $b['paid_status']==='cash'    ? 'selected':'' ?>>Cash</option>
-                  <option value="prepaid" <?= $b['paid_status']==='prepaid' ? 'selected':'' ?>>Prepaid</option>
+                  <option value="cash"    <?= $b['payment_method']==='cash'    ? 'selected':'' ?>>Cash</option>
+                  <option value="prepaid" <?= $b['payment_method']==='prepaid' ? 'selected':'' ?>>Prepaid</option>
                 </select>
               </td>
               <td>

@@ -8,10 +8,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
   <style>
     body {
-      background-color: #4e8aa0;
+      background-color: #bdcfda;
     }
     .login-card {
-      background-color: #134557;
+      background-color: #dc2626;
       overflow: hidden;
     }
     .login-card-body {
@@ -30,12 +30,12 @@
       color: #8a99a8 !important;
     }
     .btn-teal {
-      background-color: #1c4f63;
+      background-color: #dc2626;
       border: none;
       color: #fff;
     }
     .btn-teal:hover {
-      background-color: #15404f;
+      background-color: #dc2626;
       color: #fff;
     }
     .accent-cyan {
@@ -56,14 +56,15 @@
            style="width:56px; height:56px;">
         <i class="ti ti-heart-plus text-white fs-3"></i>
       </div>
-      <span class="fs-4 fw-bold text-white">Infinity +</span>
-      <small class="subtitle-muted mt-1">Home Sample Collection Management</small>
+      <span class="fs-4 fw-bold text-white">Infinity+ CRM</span>
+      <small class="fs-8 text-white">by infinityhealtpk.com</small>
+      <small class="text-white mt-1">Home Sample Collection Management</small>
     </div>
 
     <!-- White bottom section -->
     <div class="login-card-body rounded-4 p-4" style="margin-top:-1.5rem;">
 
-      <h2 class="fw-bold fs-4 mb-4" style="color:#1c4f63;">Sign In</h2>
+      <h2 class="fw-bold fs-4 mb-4" style="color:#dc2626;">Sign In</h2>
 
       <?php if (session()->getFlashdata('error')): ?>
         <div class="alert alert-danger py-2 small">
@@ -75,7 +76,7 @@
         <?= csrf_field() ?>
 
         <div class="mb-3">
-          <label class="form-label fw-medium" style="color:#1c4f63;">Email Address</label>
+          <label class="form-label fw-medium" style="color:#dc2626;">Email Address</label>
           <div class="input-group">
             <span class="input-group-text input-group-text-light">
               <i class="ti ti-mail"></i>
@@ -87,7 +88,7 @@
         </div>
 
         <div class="mb-4">
-          <label class="form-label fw-medium" style="color:#1c4f63;">Password</label>
+          <label class="form-label fw-medium" style="color:#dc2626;">Password</label>
           <div class="input-group">
             <span class="input-group-text input-group-text-light">
               <i class="ti ti-lock"></i>
@@ -108,8 +109,8 @@
 
       </form>
 
-      <p class="text-center text-muted mt-4 mb-0" style="font-size:11px;">
-        © 2026 Infinity+ · All rights reserved
+      <p class="text-center text-black mt-4 mb-0" style="font-size:11px;">
+        © 2026 Infinity+CRM · All rights reserved
       </p>
 
     </div>

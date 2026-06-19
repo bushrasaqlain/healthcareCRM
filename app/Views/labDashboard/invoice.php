@@ -508,8 +508,8 @@
                 </div>
             </div>
             <div class="invoice-status">
-                <span class="status-badge <?= $booking['paid_status'] === 'paid' ? 'status-paid' : 'status-unpaid' ?>">
-                    <?= strtoupper($booking['paid_status'] ?? 'UNPAID') ?>
+                <span class="status-badge <?= $booking['payment_method'] === 'paid' ? 'status-paid' : 'status-unpaid' ?>">
+                    <?= strtoupper($booking['payment_method'] ?? 'UNPAID') ?>
                 </span>
                 <div class="invoice-number">
                     Invoice #<?= $invoiceNumber ?>
