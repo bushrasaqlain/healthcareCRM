@@ -28,16 +28,16 @@ class LabController extends BaseController
     return view('dbadmin/lablist', ['labs' => $labs]);
 }
 
-    public function priceList($labId)
-    {
-        if (!session()->get('logged_in')) {
-            return redirect()->to('/login');
-        }
+public function priceList($labId)
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
 
-        $labModel = new LabModel();
-        $lab = $labModel->select('labs.*, users.name, users.email')
-                        ->join('users', 'users.id = labs.user_id')
-                        ->find($labId);
+    $labModel = new LabModel();
+    $lab = $labModel->select('labs.*, users.name, users.email')
+                    ->join('users', 'users.id = labs.user_id')
+                    ->find($labId);
 
     if (!$lab) {
         return redirect()->to('/lablist')->with('error', 'Lab not found.');
@@ -45,9 +45,9 @@ class LabController extends BaseController
 
     $db    = \Config\Database::connect();
     $tests = $db->table('lab_tests')->where('lab_id', $labId)->get()->getResultArray();
-    $mode = $this->request->getGet('mode') ?? 'import';  // ← move here
+    $mode  = $this->request->getGet('mode') ?? 'import';
 
-    return view('dbadmin/pricelist', ['lab' => $lab, 'tests' => $tests, 'mode'  => $mode,]);
+    return view('dbadmin/pricelist', ['lab' => $lab, 'tests' => $tests, 'mode' => $mode]);
 }
 
 public function importPriceList($labId)
@@ -103,7 +103,6 @@ public function importPriceList($labId)
         return redirect()->back()->with('error', 'Failed to read file: ' . $e->getMessage());
     }
 }
-
 public function updatePriceList($labId)
 {
     if (!session()->get('logged_in')) {
@@ -256,17 +255,42 @@ public function phlebotomist($labId)
         return redirect()->to('/lablist')->with('error', 'Lab not found.');
     }
 
-    $db           = \Config\Database::connect();
+    $db            = \Config\Database::connect();
     $phlebotomists = $db->table('phlebotomists')
                         ->where('lab_id', $labId)
                         ->get()->getResultArray();
 
     return view('dbadmin/phlebotomist', [
-        'lab'           => $lab,
-        'phlebotomists' => $phlebotomists,
+        'lab'            => $lab,
+        'phlebotomists'  => $phlebotomists,
+        'count'          => count($phlebotomists),
     ]);
 }
+public function addPhlebotomist($labId)
+{
+    if (!session()->get('logged_in')) {
+        return redirect()->to('/login');
+    }
 
+    $name = $this->request->getPost('name');
+    $city = $this->request->getPost('city');
+
+    if (empty($name)) {
+        return redirect()->back()->with('error', 'Name is required.');
+    }
+
+    $db = \Config\Database::connect();
+    $db->table('phlebotomists')->insert([
+        'lab_id'     => $labId,
+        'name'       => $name,
+        'city'       => $city,
+        'status'     => 'active',
+        'created_at' => date('Y-m-d H:i:s'),
+    ]);
+
+    return redirect()->to(base_url('labs/' . $labId . '/phlebotomist'))
+                     ->with('success', 'Phlebotomist added successfully.');
+}
 public function importPhlebotomist($labId)
 {
     if (!session()->get('logged_in')) {
@@ -324,7 +348,6 @@ public function labPriceList()
         return redirect()->to('/login');
     }
 
-    // Session se lab user ka user_id lo
     $userId = session()->get('user_id');
 
     $db  = \Config\Database::connect();

@@ -22,6 +22,7 @@ $tests = $tests ?? [
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<?= view('templates/header', ['pageTitle' => 'Lab List', 'activePage' => 'lablist']) ?>
 </head>
 <body class="bg-light">
 <?= view('templates/header', ['pageTitle' => 'Booking', 'activePage' => 'lablist']) ?>
@@ -30,7 +31,7 @@ $tests = $tests ?? [
 
   
   <div class="mb-4">
-    <h2 class="fw-bold mb-1">New Lab Booking</h2>
+    <h2 class="fw-bold mb-1" style="color:#154c80;">New Lab Booking</h2>
     <p class="text-muted mb-0">Fill in patient details and test information</p>
   </div>
 
@@ -38,13 +39,13 @@ $tests = $tests ?? [
       <?= csrf_field() ?>
 
 
-    <div class="card shadow-sm mb-4">
+    <div class="card2 shadow-sm mb-4">
       <div class="card-body p-4">
         <h5 class="fw-bold mb-4">Patient Details</h5>
 
         <div class="row g-3 mb-3">
           <div class="col-md-6">
-            <label for="patient_name" class="form-label fw-semibold">
+            <label for="patient_name" class="form-label2 fw-semibold">
               Patient Name <span class="text-danger">*</span>
             </label>
             <input type="text" class="form-control" id="patient_name" name="patient_name"
@@ -52,24 +53,23 @@ $tests = $tests ?? [
                    required>
           </div>
           <div class="col-md-6">
-  <label for="phone_number" class="form-label fw-semibold">
-    Phone Number <span class="text-danger">*</span>
-  </label>
-  <input type="text" class="form-control" id="phone_number" name="phone_number"
-         inputmode="tel" placeholder="03XX-XXXXXXX or +92XXXXXXXXXX" maxlength="13" required>
-  <small class="text-danger d-none" id="phone-error">Enter a valid Pakistani number — mobile (03XX-XXXXXXX), landline (0XX-XXXXXXX), or international (+92XXXXXXXXXX).</small>
-</div>
+            <label for="phone_number" class="form-label2 fw-semibold">
+              Phone Number <span class="text-danger">*</span>
+            </label>
+            <input type="text" class="form-control" id="phone_number" name="phone_number"
+             placeholder="03XX-XXXXXXX" required inputmode="numeric">
+          </div>
         </div>
 
         <div class="row g-3 mb-3">
           <div class="col-md-6">
-            <label for="age" class="form-label fw-semibold">
+            <label for="age" class="form-label2 fw-semibold">
               Age <span class="text-muted fw-normal">(optional)</span>
             </label>
             <input type="number" class="form-control" id="age" name="age" placeholder="e.g. 35" min="0">
           </div>
           <div class="col-md-6">
-            <label for="gender" class="form-label fw-semibold">
+            <label for="gender" class="form-label2 fw-semibold">
               Gender <span class="text-muted fw-normal">(optional)</span>
             </label>
             <select class="form-select" id="gender" name="gender">
@@ -82,21 +82,21 @@ $tests = $tests ?? [
         </div>
 
         <div class="mb-3">
-          <label for="home_address" class="form-label fw-semibold">
+          <label for="home_address" class="form-label2 fw-semibold">
             Home Address <span class="text-danger">*</span>
           </label>
           <textarea class="form-control" id="home_address" name="home_address" rows="2"
                     placeholder="Full home address for sample collection" required></textarea>
         </div>
 
-        <!-- <div class="mb-3">
-          <label for="pin_location" class="form-label fw-semibold">
+        <div class="mb-3">
+          <label for="pin_location" class="form-label2 fw-semibold">
             <i class="bi bi-geo-alt me-1"></i>Pin Location
             <span class="text-muted fw-normal">(optional — paste Google Maps link)</span>
           </label>
           <input type="url" class="form-control" id="pin_location" name="pin_location"
                  placeholder="https://maps.google.com/...">
-        </div> -->
+        </div>
 
         <div class="mb-3 position-relative">
   <label for="pin_location_search" class="form-label fw-semibold">
@@ -124,7 +124,7 @@ $tests = $tests ?? [
 </div>
 
         <div class="mb-0">
-          <label for="instructions" class="form-label fw-semibold">
+          <label for="instructions" class="form-label2 fw-semibold">
             <i class="bi bi-file-text me-1"></i>Instructions / Notes
             <span class="text-muted fw-normal">(optional — visible to lab team)</span>
           </label>
@@ -135,7 +135,7 @@ $tests = $tests ?? [
     </div>
 
     
-    <div class="card shadow-sm mb-4">
+    <div class="shadow-sm mb-4">
       <div class="card-body p-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
           <h5 class="fw-bold mb-0">Tests Ordered</h5>
@@ -154,7 +154,7 @@ $tests = $tests ?? [
         </div>
 
         <div class="mb-3 position-relative">
-          <label for="test_search" class="form-label fw-semibold">
+          <label for="test_search" class="form-label2 fw-semibold">
             Search &amp; Add Tests <span class="text-danger">*</span>
           </label>
           <div class="input-group">
@@ -177,39 +177,39 @@ $tests = $tests ?? [
     </div>
 
    
-    <div class="rounded-3 p-4 mb-4 d-none" id="financial_summary_panel" style="background-color:#0E2C40;">
+    <div class="rounded-3 p-4 mb-4 d-none" id="financial_summary_panel" style="background-color:#edeeee;">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="fw-bold text-white mb-0">
+        <h6 class="fw-bold form-label2 mb-0">
           <i class="bi bi-flask me-2"></i>Financial Summary
         </h6>
-        <span class="small" style="color:#7FB3D5;">Live preview</span>
+        <span class="form-label2 small">Live preview</span>
       </div>
 
-      <div id="summary_line_items" class="border-bottom pb-2 mb-2" style="border-color: rgba(255,255,255,0.15) !important;"></div>
+      <div id="form-label2 summary_line_items" class="border-bottom pb-2 mb-2" style="border-color: rgba(255,255,255,0.15) !important;"></div>
 
-      <div class="d-flex justify-content-between mb-1">
-        <span style="color:#9FC4DA;">Original Total (Rack Rate)</span>
-        <span class="text-white" id="summary_original">PKR 0</span>
+      <div class="form-label2 d-flex justify-content-between mb-1">
+        <span>Original Total (Rack Rate)</span>
+        <span class="form-label2" id="summary_original">PKR 0</span>
       </div>
-      <div class="d-flex justify-content-between border-bottom pb-2 mb-2" style="border-color: rgba(255,255,255,0.15) !important;">
-        <span style="color:#9FC4DA;">Total Discount</span>
-        <span style="color:#FF8A80;" id="summary_discount">- PKR 0</span>
+      <div class="form-label2 d-flex justify-content-between border-bottom pb-2 mb-2" style="border-color: rgba(255,255,255,0.15) !important;">
+        <span >Total Discount</span>
+        <span  id="summary_discount">- PKR 0</span>
       </div>
-      <div class="d-flex justify-content-between">
-        <span class="text-white fw-bold fs-5">Patient Pays</span>
-        <span class="text-white fw-bold fs-5" id="summary_patient_pays">PKR 0</span>
+      <div class="form-label2 d-flex justify-content-between">
+        <span class="form-label2 fw-bold fs-5">Patient Pays</span>
+        <span class="form-label2 fw-bold fs-5" id="summary_patient_pays">PKR 0</span>
       </div>
 
-      <div class="rounded-2 p-2 mt-3 text-center fw-semibold d-none" id="prepaid_banner"
-           style="background-color: rgba(34,197,94,0.15); color:#86EFAC;"></div>
+      <div class="form-label2 rounded-2 p-2 mt-3 text-center fw-semibold d-none" id="prepaid_banner"
+           style="background-color: rgba(34,197,94,0.15);"></div>
     </div>
 
    
     <div class="d-flex justify-content-start gap-2 mb-5">
-      <a href="<?= site_url('dashboard') ?>" class="btn btn-outline-secondary px-4">
+      <a href="<?= site_url('labDashboard/dashboard') ?>" class="btn btn-outline-secondary px-4">
         <i class="bi bi-arrow-left me-1"></i>Cancel
       </a>
-      <button type="submit" class="btn px-4 fw-semibold" style="background-color:#0E3B53;color:#fff;">
+      <button type="submit" class="btn px-4 fw-semibold" style="background-color:#154c80;color:#fff;">
         <i class="bi bi-plus-lg me-1"></i>Create Booking
       </button>
     </div>

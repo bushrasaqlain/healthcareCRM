@@ -8,6 +8,8 @@ use App\Models\LabTestModel;
 use App\Models\PatientModel;
 use App\Models\PatientTestBookingModel;
 use App\Models\ShareTokenModel;
+use App\Services\WhatsAppService;
+use App\Services\WhatsAppMessages;
 
 
 class BookingController extends BaseController
@@ -119,6 +121,17 @@ class BookingController extends BaseController
             log_message('error', 'lab_bookings insertBatch failed: ' . json_encode($bookingModel->errors()));
             log_message('error', 'Last DB error: ' . json_encode(\Config\Database::connect()->error()));
             return redirect()->back()->withInput()->with('error', 'Could not save the test bookings.');
+        }
+
+        try {
+            $whatsapp = new WhatsAppService();
+            $message  = WhatsAppMessages::forStatus(
+                'booking_created',
+                $this->request->getPost('patient_name')
+            );
+            $whatsapp->sendText($this->request->getPost('phone_number'), $message);
+        } catch (\Exception $e) {
+            log_message('error', '[WhatsApp] booking_created failed: ' . $e->getMessage());
         }
  
         return redirect()->to(site_url('labDashboard/dashboard'))
@@ -332,6 +345,23 @@ class BookingController extends BaseController
             $newStatus,
             $statusMap[$action]['message']
         );
+
+        try {
+            $patient = $db->table('patients')
+                ->where('id', $booking['fk_patient_id'])
+                ->get()->getRowArray();
+
+            if ($patient && !empty($patient['phone_number'])) {
+                $whatsapp = new WhatsAppService();
+                $message  = WhatsAppMessages::forStatus(
+                    $newStatus,
+                    $patient['patient_name']
+                );
+                $whatsapp->sendText($patient['phone_number'], $message);
+            }
+        } catch (\Exception $e) {
+            log_message('error', '[WhatsApp] status_update failed: ' . $e->getMessage());
+        }
 
         // Redirect back to booking details page
         return redirect()->to('/booking/view/' . $booking['fk_patient_id'])

@@ -51,7 +51,7 @@ public function login()
             return redirect()->to('/login');
         }
 
-        return view('dashboard');
+        return view('/dbadmin/dashboard');
     }
 
     // Logout

@@ -4,7 +4,7 @@
 
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="fw-semibold mb-0" style="color:#134557;">Edit Lab</h2>
+      <h2 class="fw-semibold mb-0" style="color:#961914;">Edit Lab</h2>
       <small class="text-muted">Update lab information</small>
     </div>
     <a href="<?= base_url('lablist') ?>" class="btn btn-outline-secondary btn-sm">
@@ -17,7 +17,7 @@
   <?php endif; ?>
 
   <div class="card border-0 shadow-sm">
-    <div class="card-body p-4">
+    <div class="card-body p-4" style="background:#fff;">
 
       <form action="<?= base_url('labs/' . $lab['id'] . '/edit') ?>" method="POST">
         <?= csrf_field() ?>
@@ -25,7 +25,7 @@
         <div class="row">
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium" style="color:#134557;">Lab Name</label>
+            <label class="hform-label1 fw-medium" style="color:#961914;">Lab Name</label>
             <div class="input-group">
               <span class="input-group-text"><i class="ti ti-flask"></i></span>
               <input type="text" name="name" class="form-control"
@@ -34,7 +34,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium" style="color:#134557;">Contact Person</label>
+            <label class="hform-label1 fw-medium" style="color:#961914;">Contact Person</label>
             <div class="input-group">
               <span class="input-group-text"><i class="ti ti-user"></i></span>
               <input type="text" name="contact_person" class="form-control"
@@ -43,7 +43,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium" style="color:#134557;">Email Address</label>
+            <label class="hform-label1 fw-medium" style="color:#961914;">Email Address</label>
             <div class="input-group">
               <span class="input-group-text"><i class="ti ti-mail"></i></span>
               <input type="email" name="email" class="form-control"
@@ -52,7 +52,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium" style="color:#134557;">Phone Number</label>
+            <label class="hform-label1 fw-medium" style="color:#961914;">Phone Number</label>
             <div class="input-group">
               <span class="input-group-text"><i class="ti ti-phone"></i></span>
               <input type="text" name="phone" class="form-control"
@@ -61,7 +61,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium" style="color:#134557;">License Number</label>
+            <label class="hform-label1 fw-medium" style="color:#961914;">License Number</label>
             <div class="input-group">
               <span class="input-group-text"><i class="ti ti-id-badge-2"></i></span>
               <input type="text" name="license_number" class="form-control"
@@ -70,7 +70,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium" style="color:#134557;">Address</label>
+            <label class="hform-label1 fw-medium" style="color:#961914;">Address</label>
             <div class="input-group">
               <span class="input-group-text"><i class="ti ti-map-pin"></i></span>
               <input type="text" name="address" class="form-control"
@@ -79,7 +79,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium" style="color:#134557;">Status</label>
+            <label class="hform-label1 fw-medium" style="color:#961914;">Status</label>
             <div class="input-group">
               <span class="input-group-text"><i class="ti ti-toggle-right"></i></span>
               <select name="status" class="form-select">
@@ -90,7 +90,7 @@
           </div>
 
           <div class="col-md-6 mb-3">
-            <label class="form-label fw-medium" style="color:#134557;">
+            <label class="hform-label1 fw-medium" style="color:#961914;">
               New Password <small class="text-muted fw-normal">(leave blank to keep current)</small>
             </label>
             <div class="input-group">
@@ -105,7 +105,7 @@
 
         </div>
 
-        <button type="submit" class="btn text-white px-4 mt-2" style="background:#134557;">
+        <button type="submit" class="btn text-white px-4 mt-2" style="background:#961914;">
           <i class="ti ti-device-floppy me-1"></i> Save Changes
         </button>
 
