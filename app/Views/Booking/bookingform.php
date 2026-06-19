@@ -24,7 +24,7 @@ $tests = $tests ?? [
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="bg-light">
-<?= view('templates/header', ['pageTitle' => 'Booking', 'activePage' => 'lablist']) ?>
+<?= view('templates/header', ['pageTitle' => 'Booking', 'activePage' => 'bookingform']) ?>
 
 <div class="container py-4" style="max-width: 860px;">
 
@@ -166,7 +166,7 @@ $tests = $tests ?? [
                id="search_dropdown" style="z-index: 1050; max-height: 320px; overflow-y: auto; top: 100%;"></div>
         </div>
 
-        <div class="rounded-3" id="tests_list" style="border: 1px dashed #ced4da;">
+        <div class="rounded-3" id="tests_list" >
   <div class="p-5 text-center" id="no_tests_row">
     <i class="bi bi-flask fs-1 text-muted d-block mb-2"></i>
     <span class="text-muted">No tests added yet. Search above to add tests.</span>
@@ -206,10 +206,10 @@ $tests = $tests ?? [
 
    
     <div class="d-flex justify-content-start gap-2 mb-5">
-      <a href="<?= site_url('dashboard') ?>" class="btn btn-outline-secondary px-4">
+      <a href="<?= site_url('labDashboard/dashboard') ?>" class="btn btn-outline-secondary px-4">
         <i class="bi bi-arrow-left me-1"></i>Cancel
       </a>
-      <button type="submit" class="btn px-4 fw-semibold" style="background-color:#0E3B53;color:#fff;">
+      <button type="submit" id="btn-new-booking" class="btn px-4 fw-semibold" >
         <i class="bi bi-plus-lg me-1"></i>Create Booking
       </button>
     </div>
@@ -369,7 +369,8 @@ bookingForm.addEventListener('submit', function (e) {
     row.dataset.name = name;
     row.className = 'p-3 border-bottom';
     row.innerHTML = `
-      <div class="d-flex justify-content-between align-items-start">
+    
+      <div class="d-flex justify-content-between align-items-start" >
         <div>
           <span class="text-muted small me-2">${test_code || ''}</span>
           <span class="fw-semibold">${name}</span>
@@ -402,6 +403,7 @@ bookingForm.addEventListener('submit', function (e) {
       <input type="hidden" name="tests[${rowCounter}][name]" value="${name}">
       <input type="hidden" name="tests[${rowCounter}][price]" value="${price}">
       <input type="hidden" class="payment-input" name="tests[${rowCounter}][payment]" value="prepaid">
+    
     `;
     testsList.appendChild(row);
     updateEmptyState();

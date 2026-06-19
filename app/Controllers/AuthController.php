@@ -13,29 +13,35 @@ class AuthController extends BaseController
     }
 
     // Handle login form submit
-    public function login()
-    {
-        $email    = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+   // Handle login form submit
+public function login()
+{
+    $email    = $this->request->getPost('email');
+    $password = $this->request->getPost('password');
 
-        $userModel = new UserModel();
-        $user = $userModel->getUserByEmail($email);
+    $userModel = new UserModel();
+    $user = $userModel->getUserByEmail($email);
 
-        // Check user exists and password matches
-        if (!$user || !password_verify($password, $user['password'])) {
-            return redirect()->to('/login')->with('error', 'Invalid email or password');
-        }
-
-        // Save user in session
-        session()->set([
-            'user_id'   => $user['id'],
-            'user_name' => $user['name'],
-            'user_role' => $user['role'],
-            'logged_in' => true,
-        ]);
-
-        return redirect()->to('/dashboard');
+    // Check user exists and password matches
+    if (!$user || !password_verify($password, $user['password'])) {
+        return redirect()->to('/login')->with('error', 'Invalid email or password');
     }
+
+    // Save user in session
+    session()->set([
+        'user_id'   => $user['id'],
+        'user_name' => $user['name'],
+        'user_role' => $user['role'],
+        'logged_in' => true,
+    ]);
+
+    // ─── Redirect based on role ───────────────────────────────
+    if ($user['role'] === 'admin') {
+        return redirect()->to('/dbadmin/dashboard');
+    }
+
+    return redirect()->to('/labDashboard/dashboard');
+}
 
     // Dashboard page
     public function dashboard()
